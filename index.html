@@ -1,0 +1,293 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>Search Workbench</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <link href="custom.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <script>
+
+  </script>
+
+</head>
+
+<!--
+Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
+-->
+<body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<div class="container">
+
+<div id="topbanner" class="jumbotron">
+  <h1>Search Workbench</h1>
+  <a id="about" class="label label-default" href="about.html">About MeSH Category Graph</a>
+</div>
+
+<div class="row">
+
+<!--<form id="search">
+    <input id="pmsearch" type="text" />
+    <input id="runsearch" type="button" value="Search by category" />
+</form>
+-->
+
+<div id="left" class="col-sm-12 col-md-10 col-lg-9">
+
+<div id="search" class="input-group input-group-lg">
+  <input type="text" id="pmsearch" class="form-control">
+  <span class="input-group-btn">
+    <button id="runsearch" class="btn btn-default" type="button">Search</button>
+  </span>
+
+</div>
+
+<div id="printable">
+  <div id="printable-stuff">
+  <span class="close">×</span>
+  <!--<canvas id="myCanvas2" width="900" height="550" >
+    Your browser does not support the HTML5 canvas tag.</canvas>-->
+  </div>
+</div>
+
+<div id="translation">
+  <div id="splash">
+    <p>Don't Enter your MEDLINE search above, and MeSH Category Graph will show how the concepts in your results stack up against the <a href="https://www.nlm.nih.gov/bsd/disted/meshtutorial/meshtreestructures/">16 top-level categories</a>
+      in the MeSH hierarchy. For each search you'll see <em>two</em> graphs &mdash; one showing percentages compared to those for
+      all of MEDLINE and another showing relative proportion. Once you have completed at least two searches, you can <em>compare</em> the proportions of one search against another. <em><a href="about.html">(more)</a></em></p>
+    </div>
+</div>
+
+</div>
+
+<div class="col-sm-12 col-md-2 col-lg-3">
+
+<div id="past" class="panel panel-default hideme">
+  <div class="panel-heading">
+    <h3 class="panel-title">Past searches</h3>
+  </div>
+  <div class="panel-body">
+    <dl></dl>
+  </div>
+</div>
+
+</div>
+
+
+</div>
+</div>
+
+
+<footer class="footer">
+  <div class="container">
+    <span class="text-muted">  <p>Design and contruction by Ed Sperr, M.L.I.S. (<a href="mailto:ed_sperr@hotmail.com">ed_sperr@hotmail.com</a>)   |
+      Data from <a href="http://www.ncbi.nlm.nih.gov/">NCBI</a>  |   Charting tools from  <a href="https://developers.google.com/chart/interactive/docs/gallery/barchart" target="_blank">Google</a>
+     | See the code at <a href="https://github.com/esperr/mesh-cat-graph">GitHub</a></p></span>
+  </div>
+</footer>
+
+
+<script>
+
+(function() {
+
+var searches = [];
+var search = [];
+
+var currentwidth = $("#left").innerWidth() * .9;
+var mywidth = 600;
+var myheight = 342;
+if (currentwidth > mywidth) {
+  mywidth = currentwidth;
+  myheight = currentwidth*.57;
+}
+console.log(mywidth);
+
+function handlesearch() {
+  var term = $("#pmsearch").val();
+  dosearch(term);
+  $("#pmsearch").val("");
+  $( "#translation" ).empty();
+  $( "#translation" ).append("<p>Your search:</p>");
+  $( "#translation p" ).append(term);
+
+  //document.getElementById('pmsearch').focus();
+  }
+
+
+  function showWait() {
+    $( "#pmsearch" ).prop( "disabled", true );
+    $( "#runsearch" ).prop( "disabled", true );
+    $( "form" ).addClass( "hideme" );
+    }
+
+    function showDone() {
+      $( "#pmsearch" ).prop( "disabled", false );
+      $( "#runsearch" ).prop( "disabled", false );
+      $( "form" ).removeClass( "hideme" );
+      $( "#runsearch" ).removeClass( "hideme" );
+      $("#loading").remove();
+      $("#fetchresults").remove();
+      }
+
+$( "#past" ).on( "click", ".pastsearch", function() {
+  var searchIndex = $(this).data("searchIndex");
+  displayCounts(searchIndex);
+  });
+
+$( "#translation" ).on( "click", "#searchedits", function() {
+    var newterm = $("#translationtext").text();
+    dosearch(newterm);
+    $( "#translation" ).empty();
+  });
+
+$( "#past" ).on( "click", "#showcompare", function() {
+    $( "#past" ).empty();
+    $( "#past" ).append("<p>Choose any two searches to compare</p>");
+    $( "#past" ).append("<dl>");
+    for (var i = 1; i < searches.length; i++) {
+      $( "#past dl" ).append('<dt><input type="checkbox" name="term" id="' + i + '" value="' + i + '"> <label for="' + i + '">' + searches[i].term + '</label></dt>');
+    }
+    $("#past dl").after('<input id="compare" type="button" value="Compare" /><p style="margin-top: 1em;"><a href="#!" class="showsearches">(go back to search list)</a></p>')
+    });
+
+$( "#past" ).on( "click", "#compare", function() {
+    var searchone = $("input[name='term']:checked").first().val();
+    var searchtwo = $("input[name='term']:checked").last().val();
+    compareTerms(searchone, searchtwo);
+    });
+
+$( "#past" ).on( "click", ".showsearches", function() {
+    showSearches();
+    });
+
+function showSearches() {
+  $( "#past" ).empty();
+  $( "#past" ).removeClass( "hideme" );
+  $( "#past" ).append("<div class='panel-heading'>");
+  $( "#past div" ).append("<h3 class='panel-title'>Searches</h3>");
+  $( "#past" ).append("<dl>");
+  for (var i = 1; i < searches.length; i++) {
+    $("#past dl").append('<dt class="pastsearch"><a href="#!">' + searches[i].term + "</a></dt>");
+    $("#past dt").last().data("searchIndex", i);
+    }
+    if (searches.length > 2) {
+      $("#past dl").after('<input id="showcompare" type="button" value="Compare searches" />')
+    }
+ }
+
+function showTranslation(translation) {
+  $( "#translation" ).append("<p class='workplace'>");
+  $( "#translation" ).append("<p>Translated to:</p>");
+  $( "#translation" ).append("<div id='translationtext' contenteditable>");
+  newtranslation = fieldstyle(translation);
+  $( "#translationtext" ).append(newtranslation);
+  $("#translationtext").after('<br /><button id="searchedits" type="button" class="btn btn-warning">Try this search</button>');
+
+  function fieldstyle(transtext) {
+    var leftbracket = transtext.replace(/\[/g, '<span class="field">[');
+    var rightbracket = leftbracket.replace(/\]/g, ']</span>');
+    console.log(rightbracket);
+    return rightbracket;
+    }
+  }
+
+ //they can only select two terms to compare....
+ $( "#past" ).on( "change", "input[name='term']:checked", function() {
+   var cnt = $("input[name='term']:checked").length;
+   if (cnt > 2) {
+     $("input[name='term']:checked").first().prop( "checked", false );
+   }
+ });
+
+ //If something goes wrong, we start over
+ function startOver() {
+   $("#loading").remove();
+   console.log("Something bad happened when we called the API...");
+   searches.pop();
+   handlesearch();
+   }
+
+
+function dosearch(term) {
+  showWait();
+  $.ajax({
+    url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi',
+    error: function () {
+      startOver();
+      return;
+    },
+    data: {
+    db: 'pubmed',
+    usehistory: 'y',
+    term: term ,
+    retmode: 'json',
+    retmax: 0,
+    email: 'ed_sperr@hotmail.com',
+    tool: 'pmsearchbench'
+    },
+    success: function( data ) {
+      // e.g. filter the response
+      if (!data.esearchresult.count) {
+        //if there's no count  we have to start over
+        startOver();
+        return;
+      }
+      if (data.esearchresult.count == "0") {
+        $("#translation").prepend('<div class="alert alert-danger" role="alert">Nothing found for this search. Please try again</div>');
+        showDone();
+        return;
+      } else {
+      search = {
+        'term': term,
+        'count': data.esearchresult.count,
+        'categories': []
+      };
+      searches.push(search);
+      showDone();
+      showSearches();
+      showTranslation(data.esearchresult.querytranslation);
+      }
+    }
+  });
+}
+
+$("#runsearch").click(function(){
+    handlesearch();
+  });
+
+ $(document).keypress(function(e) {
+  if(e.which == 13) {
+      //Because both IE and FF now "helpfully" ignore the spec and treat 'button' the same as 'submit'
+      e.preventDefault();
+      handlesearch();
+  }
+});
+
+
+
+
+$(".close").click(function(){
+  $("#printable").css("display", "none");
+      });
+
+$(document).click(function(event) {
+   var closeit = document.getElementById('printable');
+   if (event.target == closeit) {
+      $("#printable").css("display", "none");
+      }
+      });
+
+
+
+})
+
+();
+
+
+
+
+</script>
+</body>
+</html>

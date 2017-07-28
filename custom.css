@@ -1,0 +1,118 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  margin-left: 4em;
+  margin-right: 4em;
+  /* Margin bottom by footer height */
+margin-bottom: 60px;
+  }
+
+#topbanner {
+  color: white;
+  background-color: rgb(70,131,193);
+  font-family: "Century Gothic", Helvetica, sans-serif;
+  padding-top: .8em;
+  padding-bottom: 1em;
+
+  }
+
+#topbanner h1 {
+  font-size:
+}
+#search {
+    border: 1px solid grey;
+    border-radius: 10px;
+    margin-bottom: 2em;
+    padding: 2em;
+  }
+
+.hideme { display: none; }
+
+.percentagechart, .comparechart, .proportionchart {
+  padding: 1.5em;
+  margin-top: 1em;
+ }
+
+ #past dl { padding: 1em;
+            margin-bottom: 0; }
+
+#past p {
+  margin-left: 1em;
+}
+
+ #compare, #showcompare { margin: 1em; }
+
+ #left{
+   min-width: 700px;
+  }
+
+ #printable {
+   display: none; /* Hidden by default */
+   position: fixed; /* Stay in place */
+   z-index: 3; /* Sit on top */
+   padding-top: 100px; /* Location of the box */
+   left: 0;
+   top: 0;
+   width: 100%; /* Full width */
+   height: 100%; /* Full height */
+   overflow: auto; /* Enable scroll if needed */
+   background-color: rgb(0,0,0); /* Fallback color */
+   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+ }
+
+ #printable-stuff {
+   background-color: #fefefe;
+   margin: auto;
+   padding: 20px;
+   border: 1px solid #888;
+   width: 80%;
+ }
+
+ #percentkey {
+     font-weight: bold;
+     font-size: .9em;
+     z-index: 2;
+     position: absolute;
+     left: 85%;
+ }
+
+ #translation {
+  border: 1px solid grey;
+  border-radius: 10px;
+  margin-bottom: 2em;
+  padding: 2em;  border
+  }
+
+ #translationtext {
+   font-size: 1.5em;
+   padding: 1em;
+  }
+
+.field {
+  color: grey;
+}
+
+ #about {
+  	float: right;
+  	color: black;
+  	background-color: white;
+  	font-size: 125%;
+  }
+
+  #about:hover, #about:focus {
+  	background-color: rgb(202,220,237);
+  }
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  line-height: 60px; /* Vertically center the text there */
+  background-color: #f5f5f5;
+}
