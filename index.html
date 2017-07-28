@@ -108,10 +108,6 @@ function handlesearch() {
   var term = $("#pmsearch").val();
   dosearch(term);
   $("#pmsearch").val("");
-  $( "#translation" ).empty();
-  $( "#translation" ).append("<p>Your search:</p>");
-  $( "#translation p" ).append(term);
-
   //document.getElementById('pmsearch').focus();
   }
 
@@ -133,14 +129,30 @@ function handlesearch() {
 
 $( "#past" ).on( "click", ".pastsearch", function() {
   var searchIndex = $(this).data("searchIndex");
-  displayCounts(searchIndex);
+  showCurrentSearch(searchIndex);
+  });
+
+$( "#translation" ).on( "click", "#showedit", function() {
+
+    //$( "#translation" ).empty();
   });
 
 $( "#translation" ).on( "click", "#searchedits", function() {
     var newterm = $("#translationtext").text();
     dosearch(newterm);
-    $( "#translation" ).empty();
+    //$( "#translation" ).empty();
   });
+
+  $( "#translation" ).on( "click", "#showedit", function() {
+      $( "#showedit" ).remove();
+      $( "#yourterm" ).remove();
+      $( "#count" ).remove();
+
+      $('#translationtext').attr('contenteditable','true');
+      $('#translationtext').addClass( "editing" );
+      $("#translationtext").after('<br /><button id="searchedits" type="button" class="btn btn-warning">Try this search</button>');
+      //$( "#translation" ).empty();
+    });
 
 $( "#past" ).on( "click", "#showcompare", function() {
     $( "#past" ).empty();
@@ -168,7 +180,7 @@ function showSearches() {
   $( "#past" ).append("<div class='panel-heading'>");
   $( "#past div" ).append("<h3 class='panel-title'>Searches</h3>");
   $( "#past" ).append("<dl>");
-  for (var i = 1; i < searches.length; i++) {
+  for (var i = 0; i < searches.length; i++) {
     $("#past dl").append('<dt class="pastsearch"><a href="#!">' + searches[i].term + "</a></dt>");
     $("#past dt").last().data("searchIndex", i);
     }
@@ -177,21 +189,32 @@ function showSearches() {
     }
  }
 
-function showTranslation(translation) {
-  $( "#translation" ).append("<p class='workplace'>");
-  $( "#translation" ).append("<p>Translated to:</p>");
-  $( "#translation" ).append("<div id='translationtext' contenteditable>");
-  newtranslation = fieldstyle(translation);
+function showCurrentSearch(myindex) {
+  if (myindex === undefined) {
+    myindex = searches.length -1;
+  }
+  var currentSearch = searches[myindex];
+  $( "#translation" ).empty();
+  $( "#translation" ).append('<p id="yourterm">Your search:</p>');
+  $( "#yourterm" ).append("'" + currentSearch.term + "'");
+  $( "#translation" ).append('<p>Was translated to:</p>');
+  $( "#translation" ).append("<div id='translationtext'>");
+  var newtranslation = fieldstyle(currentSearch.translation);
   $( "#translationtext" ).append(newtranslation);
-  $("#translationtext").after('<br /><button id="searchedits" type="button" class="btn btn-warning">Try this search</button>');
+  $( "#translation" ).append('<span id="count">' + currentSearch.count + '</span>');
+  $( "#translation" ).append('<br /><button id="showedit" type="button" class="btn btn-warning">Edit this search</button>');
+}
+
+function editTranslation() {
+  //$( "#translation" ).empty();
+
+  }
 
   function fieldstyle(transtext) {
     var leftbracket = transtext.replace(/\[/g, '<span class="field">[');
     var rightbracket = leftbracket.replace(/\]/g, ']</span>');
-    console.log(rightbracket);
     return rightbracket;
     }
-  }
 
  //they can only select two terms to compare....
  $( "#past" ).on( "change", "input[name='term']:checked", function() {
@@ -242,12 +265,15 @@ function dosearch(term) {
       search = {
         'term': term,
         'count': data.esearchresult.count,
-        'categories': []
+        'translation': data.esearchresult.querytranslation,
+        'nickname': ''
       };
       searches.push(search);
+      console.log(searches);
       showDone();
       showSearches();
-      showTranslation(data.esearchresult.querytranslation);
+      showCurrentSearch();
+      //showTranslation(data.esearchresult.querytranslation);
       }
     }
   });
