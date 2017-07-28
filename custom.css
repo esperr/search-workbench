@@ -87,7 +87,7 @@ margin-bottom: 60px;
   padding: 2em;  border
   }
 
- #translationtext {
+ .editing {
    font-size: 1.5em;
    padding: 1em;
   }
