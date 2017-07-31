@@ -94,6 +94,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 
 var searches = [];
 var search = [];
+var pubmedURLstem = "https://www.ncbi.nlm.nih.gov/pubmed/?term=";
 
 var currentwidth = $("#left").innerWidth() * .9;
 var mywidth = 600;
@@ -106,6 +107,9 @@ console.log(mywidth);
 
 function handlesearch() {
   var term = $("#pmsearch").val();
+  if (!term) {
+    return;
+  }
   dosearch(term);
   $("#pmsearch").val("");
   //document.getElementById('pmsearch').focus();
@@ -138,19 +142,21 @@ $( "#translation" ).on( "click", "#showedit", function() {
   });
 
 $( "#translation" ).on( "click", "#searchedits", function() {
+    $( "#search" ).toggle();
     var newterm = $("#translationtext").text();
     dosearch(newterm);
     //$( "#translation" ).empty();
   });
 
   $( "#translation" ).on( "click", "#showedit", function() {
+      $( "#search" ).toggle();
       $( "#showedit" ).remove();
       $( "#yourterm" ).remove();
       $( "#count" ).remove();
 
       $('#translationtext').attr('contenteditable','true');
       $('#translationtext').addClass( "editing" );
-      $("#translationtext").after('<br /><button id="searchedits" type="button" class="btn btn-warning">Try this search</button>');
+      $("#translationtext").after('<br /><button id="searchedits" type="button" class="btn btn-primary">Try this search</button>');
       //$( "#translation" ).empty();
     });
 
@@ -201,14 +207,9 @@ function showCurrentSearch(myindex) {
   $( "#translation" ).append("<div id='translationtext'>");
   var newtranslation = fieldstyle(currentSearch.translation);
   $( "#translationtext" ).append(newtranslation);
-  $( "#translation" ).append('<span id="count">' + currentSearch.count + '</span>');
+  $( "#translation" ).append('<span id="count">For <a href="' + pubmedURLstem + encodeURI(currentSearch.term) + '">' + currentSearch.count + '</a> results</span>');
   $( "#translation" ).append('<br /><button id="showedit" type="button" class="btn btn-warning">Edit this search</button>');
 }
-
-function editTranslation() {
-  //$( "#translation" ).empty();
-
-  }
 
   function fieldstyle(transtext) {
     var leftbracket = transtext.replace(/\[/g, '<span class="field">[');
@@ -226,10 +227,11 @@ function editTranslation() {
 
  //If something goes wrong, we start over
  function startOver() {
-   $("#loading").remove();
-   console.log("Something bad happened when we called the API...");
+   //$("#loading").remove();
+   alert("Something bad happened when we called the API...");
    searches.pop();
-   handlesearch();
+   showDone();
+   //handlesearch();
    }
 
 
@@ -258,6 +260,7 @@ function dosearch(term) {
         return;
       }
       if (data.esearchresult.count == "0") {
+
         $("#translation").prepend('<div class="alert alert-danger" role="alert">Nothing found for this search. Please try again</div>');
         showDone();
         return;

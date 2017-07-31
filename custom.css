@@ -87,13 +87,18 @@ margin-bottom: 60px;
   padding: 2em;  border
   }
 
+  #translationtext {
+    padding: 1em;
+  }
+
  .editing {
    font-size: 1.5em;
    padding: 1em;
+   border: 1px dotted grey;
   }
 
 .field {
-  color: grey;
+  color: Silver;
 }
 
  #about {
