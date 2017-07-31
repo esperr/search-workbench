@@ -136,16 +136,11 @@ $( "#past" ).on( "click", ".pastsearch", function() {
   showCurrentSearch(searchIndex);
   });
 
-$( "#translation" ).on( "click", "#showedit", function() {
-
-    //$( "#translation" ).empty();
-  });
-
+//Modifying a search and running it again
 $( "#translation" ).on( "click", "#searchedits", function() {
     $( "#search" ).toggle();
     var newterm = $("#translationtext").text();
     dosearch(newterm);
-    //$( "#translation" ).empty();
   });
 
   $( "#translation" ).on( "click", "#showedit", function() {
@@ -156,7 +151,9 @@ $( "#translation" ).on( "click", "#searchedits", function() {
 
       $('#translationtext').attr('contenteditable','true');
       $('#translationtext').addClass( "editing" );
+      $("#translationtext").after("Add a nickname for this search: <input type='text' name='nickname'>");
       $("#translationtext").after('<br /><button id="searchedits" type="button" class="btn btn-primary">Try this search</button>');
+
       //$( "#translation" ).empty();
     });
 
@@ -181,13 +178,20 @@ $( "#past" ).on( "click", ".showsearches", function() {
     });
 
 function showSearches() {
+  var searchname;
   $( "#past" ).empty();
   $( "#past" ).removeClass( "hideme" );
   $( "#past" ).append("<div class='panel-heading'>");
   $( "#past div" ).append("<h3 class='panel-title'>Searches</h3>");
   $( "#past" ).append("<dl>");
   for (var i = 0; i < searches.length; i++) {
-    $("#past dl").append('<dt class="pastsearch"><a href="#!">' + searches[i].term + "</a></dt>");
+    if (searches[i].nickname) {
+      searchname = '"' + searches[i].nickname + '"';
+    } else {
+      searchname =  searches[i].term;
+    }
+    $("#past dl").append('<dt class="pastsearch"><a href="#!">' + searchname + "</a></dt>");
+    $("#past dt").last().append(": " + searches[i].count );
     $("#past dt").last().data("searchIndex", i);
     }
     if (searches.length > 2) {
@@ -203,6 +207,9 @@ function showCurrentSearch(myindex) {
   $( "#translation" ).empty();
   $( "#translation" ).append('<p id="yourterm">Your search:</p>');
   $( "#yourterm" ).append("'" + currentSearch.term + "'");
+  if (currentSearch.nickname) {
+    $( "#yourterm" ).append(' (alias "' + currentSearch.nickname + '")');
+  }
   $( "#translation" ).append('<p>Was translated to:</p>');
   $( "#translation" ).append("<div id='translationtext'>");
   var newtranslation = fieldstyle(currentSearch.translation);
@@ -265,11 +272,13 @@ function dosearch(term) {
         showDone();
         return;
       } else {
+      var nickname = "";
+      if ( $("input[name='nickname']")) { nickname = $("input[name='nickname']").val(); }
       search = {
         'term': term,
         'count': data.esearchresult.count,
         'translation': data.esearchresult.querytranslation,
-        'nickname': ''
+        'nickname': nickname
       };
       searches.push(search);
       console.log(searches);
