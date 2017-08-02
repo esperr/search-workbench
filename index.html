@@ -98,8 +98,9 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 
 (function() {
 
-var searches = [];
-var search = [];
+var searches = {};
+var searchkey = 0;
+
 var pubmedURLstem = "https://www.ncbi.nlm.nih.gov/pubmed/?term=";
 google.charts.load('current', {'packages':['line']});
 
@@ -119,8 +120,6 @@ function handlesearch() {
     return;
   }
   dosearch(term);
-  $("#pmsearch").val("");
-  //document.getElementById('pmsearch').focus();
   }
 
 
@@ -141,7 +140,7 @@ function handlesearch() {
 
 $( "#past" ).on( "click", ".pastsearch", function() {
   var searchIndex = $(this).data("searchIndex");
-  showCurrentSearch(searches[searchIndex]);
+  showCurrentSearch(searchIndex);
   });
 
 //Modifying a search and running it again
@@ -192,22 +191,26 @@ function showSearches() {
   $( "#past" ).append("<div class='panel-heading'>");
   $( "#past div" ).append("<h3 class='panel-title'>Searches</h3>");
   $( "#past" ).append("<dl>");
-  for (var i = 0; i < searches.length; i++) {
-    if (searches[i].nickname) {
-      searchname = '"' + searches[i].nickname + '"';
-    } else {
-      searchname =  searches[i].term;
+  for (var key in searches) {
+    if (searches.hasOwnProperty(key)) {
+      console.log(key + " -> " + searches[key]);
+      if (searches[key].nickname) {
+        searchname = '"' + searches[key].nickname + '"';
+      } else {
+        searchname =  searches[key].term;
+      }
+      $("#past dl").append('<dt class="pastsearch"><a href="#!">' + searchname + "</a></dt>");
+      $("#past dt").last().append(": " + searches[key].count );
+      $("#past dt").last().data("searchIndex", key);
     }
-    $("#past dl").append('<dt class="pastsearch"><a href="#!">' + searchname + "</a></dt>");
-    $("#past dt").last().append(": " + searches[i].count );
-    $("#past dt").last().data("searchIndex", i);
-    }
-    if (searches.length > 2) {
-      $("#past dl").after('<input id="showcompare" type="button" value="Compare searches" />')
-    }
+  }
+  if ($("#past dt").last().data("searchIndex") > 0) {
+    $("#past dl").after('<input id="showcompare" type="button" value="Compare searches" />')
+  }
  }
 
-function showCurrentSearch(currentSearch) {
+function showCurrentSearch(searchkey) {
+  currentSearch = searches[searchkey];
   $( "#translation" ).empty();
   $( "#translation" ).append('<p id="yourterm">Your search:</p>');
   $( "#yourterm" ).append("'" + currentSearch.term + "'");
@@ -279,17 +282,19 @@ function dosearch(term) {
       } else {
       var nickname = "";
       if ( $("input[name='nickname']")) { nickname = $("input[name='nickname']").val(); }
+
       search = {
         'term': term,
         'count': data.esearchresult.count,
         'translation': data.esearchresult.querytranslation,
         'nickname': nickname
       };
-      searches.push(search);
-      console.log(searches);
+      searches[searchkey] = search;
+
       showDone();
       showSearches();
-      showCurrentSearch(search);
+      showCurrentSearch(searchkey);
+      searchkey++;
       //showTranslation(data.esearchresult.querytranslation);
       }
     }
