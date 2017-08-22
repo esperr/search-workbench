@@ -112,6 +112,26 @@ margin-bottom: 60px;
   	background-color: rgb(202,220,237);
   }
 
+  #charts {
+    padding-bottom: 80px;
+  }
+
+
+#yearresults {
+  float: right;
+}
+
+.venntooltip {
+  position: absolute;
+  text-align: center;
+  background: #333;
+  color: #ddd;
+  padding: 2px;
+  border: 0px;
+  border-radius: 8px;
+  opacity: 0;
+}
+
 .footer {
   position: absolute;
   bottom: 0;
