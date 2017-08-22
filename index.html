@@ -17,9 +17,11 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 -->
 <body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="venn.js"></script>
 <script src="vennframework.js"></script>
 <script src="yearframework.js"></script>
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <div class="container">
 
 <div id="topbanner" class="jumbotron">
@@ -61,9 +63,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
     </div>
 </div>
 
-<div id="charts">
 
-</div>
 
 </div>
 
@@ -82,6 +82,18 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 
 
 </div>
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <div id="charts">
+      <div id="yearresults">
+      </div>
+      <div id="vennresults">
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>
 
 
@@ -95,24 +107,27 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 
 
 <script>
-
-(function() {
-
 var searches = {};
 var searchkey = 0;
-
 var pubmedURLstem = "https://www.ncbi.nlm.nih.gov/pubmed/?term=";
+
+var chartwidth = $("#charts").innerWidth() * .9;
+var yearwidth = chartwidth / 2;
+var vennwidth = chartwidth / 2;
+
+var myyearwidth = 500;
+var myyearheight = 250;
+if (yearwidth > myyearwidth) {
+  myyearwidth = yearwidth;
+  myyearheight = yearwidth*.50;
+}
+console.log(myyearwidth);
+$( "#yearresults" ).attr( "style", "max-width: " + yearwidth + "px;" );
+$( "#vennresults" ).attr( "style", "max-width: " + vennwidth + "px;" );
+
 google.charts.load('current', {'packages':['line']});
 
-
-var currentwidth = $("#left").innerWidth() * .9;
-var mywidth = 600;
-var myheight = 342;
-if (currentwidth > mywidth) {
-  mywidth = currentwidth;
-  myheight = currentwidth*.57;
-}
-console.log(mywidth);
+(function() {
 
 function handlesearch() {
   var term = $("#pmsearch").val();
@@ -125,8 +140,12 @@ function handlesearch() {
 
   function showWait() {
     $( "#pmsearch" ).prop( "disabled", true );
+    $( "#pmsearch").val(" ");
     $( "#runsearch" ).prop( "disabled", true );
     $( "form" ).addClass( "hideme" );
+    $( "#yearresults").empty();
+    $( "#yearresults" ).append("<div id='loading'><p class='text-center'>Grabbing your results &mdash; please wait</p></div>")
+    $( "#yearresults p" ).append( '<br /><img src="loading-bars.svg">' );
     }
 
     function showDone() {
@@ -134,13 +153,17 @@ function handlesearch() {
       $( "#runsearch" ).prop( "disabled", false );
       $( "form" ).removeClass( "hideme" );
       $( "#runsearch" ).removeClass( "hideme" );
-      $("#loading").remove();
+      //$("#loading").remove();
       $("#fetchresults").remove();
       }
 
 $( "#past" ).on( "click", ".pastsearch", function() {
   var searchIndex = $(this).data("searchIndex");
   showCurrentSearch(searchIndex);
+  drawYearChart([searchIndex]);
+  var mysets = searches[searchIndex].vennsets;
+  //console.log(JSON.stringify(searches[searchIndex].vennsets));
+  drawVennDiagram(mysets);
   });
 
 //Modifying a search and running it again
@@ -165,19 +188,25 @@ $( "#translation" ).on( "click", "#searchedits", function() {
     });
 
 $( "#past" ).on( "click", "#showcompare", function() {
-    $( "#past" ).empty();
-    $( "#past" ).append("<p>Choose any two searches to compare</p>");
-    $( "#past" ).append("<dl>");
-    for (var i = 1; i < searches.length; i++) {
-      $( "#past dl" ).append('<dt><input type="checkbox" name="term" id="' + i + '" value="' + i + '"> <label for="' + i + '">' + searches[i].term + '</label></dt>');
-    }
+    $("#past input[name='term']").toggle();
+    $("#showcompare").toggle();
     $("#past dl").after('<input id="compare" type="button" value="Compare" /><p style="margin-top: 1em;"><a href="#!" class="showsearches">(go back to search list)</a></p>')
     });
 
 $( "#past" ).on( "click", "#compare", function() {
-    var searchone = $("input[name='term']:checked").first().val();
-    var searchtwo = $("input[name='term']:checked").last().val();
-    compareTerms(searchone, searchtwo);
+    var comparisons = [];
+    var compareterms = [];
+    $( "input[name='term']" ).each(function( index ) {
+      if (this.checked) {
+          searchNum = $( this ).val();
+          compareterms.push(searches[searchNum].term);
+          if (searches[searchNum].yearcounts) {
+            comparisons.push( $( this ).val() );
+          }
+        }
+      });
+      compVenn(compareterms);
+      drawYearChart(comparisons);
     });
 
 $( "#past" ).on( "click", ".showsearches", function() {
@@ -193,17 +222,17 @@ function showSearches() {
   $( "#past" ).append("<dl>");
   for (var key in searches) {
     if (searches.hasOwnProperty(key)) {
-      console.log(key + " -> " + searches[key]);
       if (searches[key].nickname) {
         searchname = '"' + searches[key].nickname + '"';
       } else {
         searchname =  searches[key].term;
       }
-      $("#past dl").append('<dt class="pastsearch"><a href="#!">' + searchname + "</a></dt>");
+      $("#past dl").append('<dt class="pastsearch"><input type="checkbox" name="term" id="' + key + '" value="' + key + '"> <a href="#!">' + searchname + "</a></dt>");
       $("#past dt").last().append(": " + searches[key].count );
       $("#past dt").last().data("searchIndex", key);
     }
   }
+  $("#past input[name='term']").toggle();
   if ($("#past dt").last().data("searchIndex") > 0) {
     $("#past dl").after('<input id="showcompare" type="button" value="Compare searches" />')
   }
@@ -223,7 +252,6 @@ function showCurrentSearch(searchkey) {
   $( "#translationtext" ).append(newtranslation);
   $( "#translation" ).append('<span id="count">For <a href="' + pubmedURLstem + encodeURI(currentSearch.term) + '">' + currentSearch.count + '</a> results</span>');
   $( "#translation" ).append('<br /><button id="showedit" type="button" class="btn btn-warning">Edit this search</button>');
-  //yearsearch(currentSearch.term);
 }
 
   function fieldstyle(transtext) {
@@ -231,14 +259,6 @@ function showCurrentSearch(searchkey) {
     var rightbracket = leftbracket.replace(/\]/g, ']</span>');
     return rightbracket;
     }
-
- //they can only select two terms to compare....
- $( "#past" ).on( "change", "input[name='term']:checked", function() {
-   var cnt = $("input[name='term']:checked").length;
-   if (cnt > 2) {
-     $("input[name='term']:checked").first().prop( "checked", false );
-   }
- });
 
  //If something goes wrong, we start over
  function startOver() {
@@ -293,6 +313,13 @@ function dosearch(term) {
 
       showDone();
       showSearches();
+      if (data.esearchresult.count < 500) {
+        $("#yearresults").empty();
+        $("#yearresults").append('Your search only retrieved <strong>' + data.esearchresult.count + '</strong> results. PubMed by Year can only graph searches that have at least 500 results in total.');
+      } else {
+        yearsearch(searchkey, term);
+        startVenn(searchkey, term);
+      }
       showCurrentSearch(searchkey);
       searchkey++;
       //showTranslation(data.esearchresult.querytranslation);
@@ -332,10 +359,7 @@ $(document).click(function(event) {
 })
 
 ();
-
-
-
-
 </script>
+
 </body>
 </html>
