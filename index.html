@@ -140,7 +140,7 @@ function handlesearch() {
 
   function showWait() {
     $( "#pmsearch" ).prop( "disabled", true );
-    $( "#pmsearch").val(" ");
+    $( "#pmsearch").val("");
     $( "#runsearch" ).prop( "disabled", true );
     $( "form" ).addClass( "hideme" );
     $( "#yearresults").empty();
@@ -161,9 +161,9 @@ $( "#past" ).on( "click", ".pastsearch", function() {
   var searchIndex = $(this).data("searchIndex");
   showCurrentSearch(searchIndex);
   drawYearChart([searchIndex]);
-  var mysets = searches[searchIndex].vennsets;
+  sets = searches[searchIndex].vennsets;
   //console.log(JSON.stringify(searches[searchIndex].vennsets));
-  drawVennDiagram(mysets);
+  drawVennDiagram();
   });
 
 //Modifying a search and running it again
@@ -173,18 +173,36 @@ $( "#translation" ).on( "click", "#searchedits", function() {
     dosearch(newterm);
   });
 
+$( "#translation" ).on( "click", "#canceledits", function() {
+    $( "#search" ).toggle();
+    var searchIndex = $("[name=nickname]").data("searchIndex");
+    showCurrentSearch(searchIndex);
+  });
+
   $( "#translation" ).on( "click", "#showedit", function() {
       $( "#search" ).toggle();
-      $( "#showedit" ).remove();
-      $( "#yourterm" ).remove();
-      $( "#count" ).remove();
+      $( "#showedit" ).toggle();
+      $( "#yourterm" ).toggle();
+      $( "#count" ).toggle();
 
       $('#translationtext').attr('contenteditable','true');
       $('#translationtext').addClass( "editing" );
-      $("#translationtext").after("Add a nickname for this search: <input type='text' name='nickname'>");
-      $("#translationtext").after('<br /><button id="searchedits" type="button" class="btn btn-primary">Try this search</button>');
+      $("#translationtext").after('<br /><button id="searchedits" type="button" class="btn btn-primary">Run this search</button>');
+      $("#searchedits").after(' <button id="canceledits" type="button" class="btn btn-danger">Cancel</button>');
 
       //$( "#translation" ).empty();
+    });
+
+$( "#translation" ).on( "click", "#nicknameit", function() {
+    var searchIndex = $("[name=nickname]").data("searchIndex");
+    if ( $("input[name='nickname']")) {
+      nickname = $("input[name='nickname']");
+      searches[searchIndex].nickname = $("input[name='nickname']").val();
+      //console.log(JSON.stringify(searches[searchIndex]));
+      //$( "input[name='nickname']" ).val("");
+      showSearches();
+      showCurrentSearch(searchIndex);
+     }
     });
 
 $( "#past" ).on( "click", "#showcompare", function() {
@@ -195,17 +213,17 @@ $( "#past" ).on( "click", "#showcompare", function() {
 
 $( "#past" ).on( "click", "#compare", function() {
     var comparisons = [];
-    var compareterms = [];
+    //var compareterms = [];
     $( "input[name='term']" ).each(function( index ) {
       if (this.checked) {
           searchNum = $( this ).val();
-          compareterms.push(searches[searchNum].term);
+          //compareterms.push(searches[searchNum].term);
           if (searches[searchNum].yearcounts) {
             comparisons.push( $( this ).val() );
           }
         }
       });
-      compVenn(compareterms);
+      compVenn(comparisons);
       drawYearChart(comparisons);
     });
 
@@ -246,12 +264,15 @@ function showCurrentSearch(searchkey) {
   if (currentSearch.nickname) {
     $( "#yourterm" ).append(' (alias "' + currentSearch.nickname + '")');
   }
+  $( "#yourterm" ).append('<span id="count"> found <a href="' + pubmedURLstem + encodeURI(currentSearch.term) + '">' + currentSearch.count + '</a> results</span>');
+
   $( "#translation" ).append('<p>Was translated to:</p>');
   $( "#translation" ).append("<div id='translationtext'>");
   var newtranslation = fieldstyle(currentSearch.translation);
   $( "#translationtext" ).append(newtranslation);
-  $( "#translation" ).append('<span id="count">For <a href="' + pubmedURLstem + encodeURI(currentSearch.term) + '">' + currentSearch.count + '</a> results</span>');
-  $( "#translation" ).append('<br /><button id="showedit" type="button" class="btn btn-warning">Edit this search</button>');
+  $( "#translation" ).append('<br /><button id="showedit" type="button" class="btn btn-warning">Edit this translation</button>');
+  $("#translation").append("<span id='nickname'>Add a nickname for this search: <input type='text' name='nickname'> <button id='nicknameit' type='button' class='btn btn-primary'>Add</button></span>");
+  $("[name=nickname]").data("searchIndex", searchkey);
 }
 
   function fieldstyle(transtext) {
