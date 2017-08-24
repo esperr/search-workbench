@@ -72,11 +72,10 @@ function buildOLCounts(search) {
 	   myOverlap = new setOverlapSet(search.sets,data.esearchresult.count);
 	   sets.push(myOverlap);
      if (!vennsearches.length) {
-       console.log(myIndex);
        if (!searches[myIndex].vennsets) {
          writeSets();
        }
-       drawVennDiagram(sets);
+       drawVennDiagram();
      }
   }
      });
@@ -120,7 +119,6 @@ getOLCounts();
 }
 
 function getSimpleSets(termsarray, possibles) {
-  console.log(termsarray, possibles);
  $.each(termsarray, function (i, term) {
      esearch(termsarray[i])
      .then(function( data ) {
@@ -160,7 +158,6 @@ function startVenn(searchkey, term) {
         if( parensdex == 0 && /\(/g.test(term) ) {
           parenTerm = term.slice(n,i+1);
           termsarray.push(parenTerm);
-          //console.log(termsarray);
           termPartone = term.slice(0,n);
           termParttwo = term.slice(i+1);
           term = termPartone + termParttwo;
@@ -186,7 +183,6 @@ function startVenn(searchkey, term) {
 			$("#vennresults").empty();
 			$("#vennresults").append('<p class="vennMsg">Only one valid term entered. Enter more terms or choose "expanded subjects"</p>');
 		} else {
-      console.log(JSON.stringify(termsarray));
 			getSimpleSets(termsarray, possibleTerms);
 		}
 }
@@ -201,7 +197,7 @@ function partCleaner(parts) {
   return cleanedTerms;
 }
 
-function compVenn(terms) {
+function compVenn(comparisons) {
     //clear the decks
     $("#vennresults").empty();
     $( "#vennresults" ).append('<div class="vennMsg"><p>Loading your diagram. Please wait...</p><progress id="fetchresults" value="1" max="100"></progress></div> ');
@@ -209,12 +205,37 @@ function compVenn(terms) {
     while (sets.length) { sets.pop(); }
     while (vennsearches.length) { vennsearches.pop(); }
     while (overlaps.length) { overlaps.pop(); }
+    var compareterms = [];
+    for (i=0; i<comparisons.length; i++) {
+      compareterms.push(searches[comparisons[i]].term);
+    }
+    possibleTerms = compareterms.length;
+		getSimpleSets(compareterms, possibleTerms);
+    setNickname();
 
-    possibleTerms = terms.length;
-		getSimpleSets(terms, possibleTerms);
+    function setNickname() {
+    	if (sets.length < compareterms.length) {
+    		setTimeout(setNickname, 300);
+    	} else {
+        for (i=0; i<comparisons.length; i++) {
+          if (searches[comparisons[i]].nickname) {
+            for (n=0; n<comparisons.length; n++) {
+              var origterm = searches[comparisons[i]].term;
+              console.log(origterm);
+              var setlabel = sets[n].label.replace(/\\/g, '');
+              console.log(setlabel);
+              if ( origterm == setlabel ) {
+                sets[n].label = '"' + searches[comparisons[i]].nickname + '"';
+              }
+            }
+            drawVennDiagram();
+          }
+        }
+    		}
+    }
 	}
 
-function drawVennDiagram(mysets) {
+function drawVennDiagram() {
 $("#vennresults").empty();
 var currentwidth = $("#vennresults").innerWidth();
 
@@ -223,7 +244,7 @@ var chart = venn.VennDiagram()
                  .height(currentwidth);
 
 var div = d3.select("#vennresults")
-div.datum(mysets).call(chart);
+div.datum(sets).call(chart);
 
 var fixtext = d3.selectAll("text")
          .attr("font-size","1.25em");
