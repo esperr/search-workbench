@@ -23,6 +23,7 @@ margin-bottom: 60px;
 #topbanner h1 {
   font-size:
 }
+
 #search {
     border: 1px solid grey;
     border-radius: 10px;
@@ -30,18 +31,22 @@ margin-bottom: 60px;
     padding: 2em;
   }
 
-.hideme { display: none; }
+.hideme { visibility: hidden; }
 
+/*
 .percentagechart, .comparechart, .proportionchart {
   padding: 1.5em;
   margin-top: 1em;
  }
-
+*/
  #past dl { padding: 1em;
             margin-bottom: 0; }
 
 #past p {
   margin-left: 1em;
+}
+#searches {
+  overflow: auto;
 }
 
  #compare, #showcompare { margin: 1em; }
@@ -50,20 +55,22 @@ margin-bottom: 60px;
    min-width: 700px;
   }
 
+/*
  #printable {
    display: none; /* Hidden by default */
-   position: fixed; /* Stay in place */
-   z-index: 3; /* Sit on top */
-   padding-top: 100px; /* Location of the box */
-   left: 0;
-   top: 0;
-   width: 100%; /* Full width */
-   height: 100%; /* Full height */
-   overflow: auto; /* Enable scroll if needed */
-   background-color: rgb(0,0,0); /* Fallback color */
-   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
- }
+/*   position: fixed; /* Stay in place */
+/*   z-index: 3; /* Sit on top */
+/*   padding-top: 100px; /* Location of the box */
+/*   left: 0;
+/*   top: 0;
+/*   width: 100%; /* Full width */
+/*   height: 100%; /* Full height */
+/*   overflow: auto; /* Enable scroll if needed */
+/*   background-color: rgb(0,0,0); /* Fallback color */
+/*   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+/* } */
 
+/*
  #printable-stuff {
    background-color: #fefefe;
    margin: auto;
@@ -79,6 +86,7 @@ margin-bottom: 60px;
      position: absolute;
      left: 85%;
  }
+*/
 
  #translation {
   border: 1px solid grey;
@@ -116,15 +124,22 @@ margin-bottom: 60px;
     padding-bottom: 80px;
   }
 
-
-#yearresults {
-  float: right;
-}
-
 #nickname {
   float: right;
 }
 
+#vennpanel {
+  width: 48%;
+  float: left;
+  margin-bottom: 110px;
+}
+
+#yearpanel {
+  width: 48%;
+  float: left;
+  margin-left:2em;
+
+}
 .venntooltip {
   position: absolute;
   text-align: center;
@@ -137,6 +152,7 @@ margin-bottom: 60px;
 }
 
 .footer {
+  margin-top: 60px;
   position: absolute;
   bottom: 0;
   width: 100%;
