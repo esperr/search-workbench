@@ -36,6 +36,14 @@ function yearsearch(searchkey, term) {
 
   function drawYearChart(searchNumbers) {
     //takes an array of searches to compare...
+    var searchNumbers = searchNumbers.filter(function(val) {
+      return !( searches[val].yearcounts == "none" );
+    });
+    if (searchNumbers.length < 1) {
+      $("#yearresults").empty();
+      $("#yearresults").append("Nothing to show");
+      return;
+    }
     var yearsearches = { counts:{}, searchterms:[] };
     for (var year in allCounts) {
       yearsearches.counts[year] = { "total": allCounts[year] } ;

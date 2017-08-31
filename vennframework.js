@@ -181,7 +181,8 @@ function startVenn(searchkey, term) {
 		//}
 		if (possibleTerms<2) {
 			$("#vennresults").empty();
-			$("#vennresults").append('<p class="vennMsg">Only one valid term entered. Enter more terms or choose "expanded subjects"</p>');
+			$("#vennresults").append('<p class="vennMsg">Only one valid term entered.</p>');
+      searches[myIndex].vennsets = [];
 		} else {
 			getSimpleSets(termsarray, possibleTerms);
 		}
@@ -221,16 +222,14 @@ function compVenn(comparisons) {
           if (searches[comparisons[i]].nickname) {
             for (n=0; n<comparisons.length; n++) {
               var origterm = searches[comparisons[i]].term;
-              console.log(origterm);
               var setlabel = sets[n].label.replace(/\\/g, '');
-              console.log(setlabel);
               if ( origterm == setlabel ) {
                 sets[n].label = '"' + searches[comparisons[i]].nickname + '"';
               }
             }
-            drawVennDiagram();
           }
         }
+        drawVennDiagram();
     		}
     }
 	}
@@ -291,5 +290,5 @@ div.selectAll("g")
     })
 
 
-$( "#vennresults" ).append('<p>Share this search: <a href="#!" class="shareLink">Link</a></p>');
+
 }
