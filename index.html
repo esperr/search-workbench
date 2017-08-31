@@ -17,11 +17,14 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 -->
 <body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="venn.js"></script>
 <script src="vennframework.js"></script>
 <script src="yearframework.js"></script>
+<script src="hedges.js"></script>
+
 <div class="container">
 
 <div id="topbanner" class="jumbotron">
@@ -47,14 +50,6 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 
 </div>
 
-<div id="printable">
-  <div id="printable-stuff">
-  <span class="close">×</span>
-  <!--<canvas id="myCanvas2" width="900" height="550" >
-    Your browser does not support the HTML5 canvas tag.</canvas>-->
-  </div>
-</div>
-
 <div id="translation">
   <div id="splash">
     <p>Don't Enter your MEDLINE search above, and MeSH Category Graph will show how the concepts in your results stack up against the <a href="https://www.nlm.nih.gov/bsd/disted/meshtutorial/meshtreestructures/">16 top-level categories</a>
@@ -64,17 +59,15 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 </div>
 
 
-
 </div>
 
 <div class="col-sm-12 col-md-2 col-lg-3">
 
 <div id="past" class="panel panel-default hideme">
   <div class="panel-heading">
-    <h3 class="panel-title">Past searches</h3>
+    <h3 class="panel-title">Searches</h3>
   </div>
-  <div class="panel-body">
-    <dl></dl>
+  <div id="searches" class="panel-body">
   </div>
 </div>
 
@@ -86,9 +79,43 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 <div class="row">
   <div class="col-sm-12 col-md-12 col-lg-12">
     <div id="charts">
-      <div id="yearresults">
+
+      <div id="vennpanel" class="panel panel-default hideme">
+        <div class="panel-heading">
+          <h3 class="panel-title">Venn diagram</h3>
+        </div>
+        <div class="panel-body">
+          <div id="vennresults"></div>
+        </div>
       </div>
-      <div id="vennresults">
+
+      <div id="yearpanel" class="panel panel-default hideme">
+        <div class="panel-heading">
+          <h3 class="panel-title">Proportion by year</h3>
+        </div>
+        <div class="panel-body">
+          <div id="yearresults"></div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</div>
+
+<div id="hedges-list" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Hedges</h4>
+      </div>
+      <div  class="modal-body">
+        <form id="hedges" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="hedge" class="btn btn-primary">Add Hedge</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
@@ -111,9 +138,9 @@ var searches = {};
 var searchkey = 0;
 var pubmedURLstem = "https://www.ncbi.nlm.nih.gov/pubmed/?term=";
 
-var chartwidth = $("#charts").innerWidth() * .9;
-var yearwidth = chartwidth / 2;
-var vennwidth = chartwidth / 2;
+//var chartwidth = $("#charts").innerWidth() * .9;
+var yearwidth = $("#yearresults").innerWidth() * .9;
+var vennwidth = $("#vennresults").innerWidth() * .9;
 
 var myyearwidth = 500;
 var myyearheight = 250;
@@ -121,7 +148,6 @@ if (yearwidth > myyearwidth) {
   myyearwidth = yearwidth;
   myyearheight = yearwidth*.50;
 }
-console.log(myyearwidth);
 $( "#yearresults" ).attr( "style", "max-width: " + yearwidth + "px;" );
 $( "#vennresults" ).attr( "style", "max-width: " + vennwidth + "px;" );
 
@@ -158,12 +184,18 @@ function handlesearch() {
       }
 
 $( "#past" ).on( "click", ".pastsearch", function() {
+  //while (sets.length) { sets.pop(); }
   var searchIndex = $(this).data("searchIndex");
   showCurrentSearch(searchIndex);
-  drawYearChart([searchIndex]);
-  sets = searches[searchIndex].vennsets;
   //console.log(JSON.stringify(searches[searchIndex].vennsets));
-  drawVennDiagram();
+  drawYearChart([searchIndex]);
+  if (searches[searchIndex].vennsets.length < 1) {
+    $("#vennresults").empty();
+    $("#vennresults").append('<p class="vennMsg">Only one valid term entered.</p>');
+  } else {
+    sets = searches[searchIndex].vennsets.slice(0);
+    drawVennDiagram();
+  }
   });
 
 //Modifying a search and running it again
@@ -188,7 +220,8 @@ $( "#translation" ).on( "click", "#canceledits", function() {
       $('#translationtext').attr('contenteditable','true');
       $('#translationtext').addClass( "editing" );
       $("#translationtext").after('<br /><button id="searchedits" type="button" class="btn btn-primary">Run this search</button>');
-      $("#searchedits").after(' <button id="canceledits" type="button" class="btn btn-danger">Cancel</button>');
+      $("#searchedits").after(' <button id="hedgeslink" type="button" class="btn btn-primary">Add a Hedge</button>');
+      $("#hedgeslink").after(' <button id="canceledits" type="button" class="btn btn-danger">Cancel</button>');
 
       //$( "#translation" ).empty();
     });
@@ -198,12 +231,27 @@ $( "#translation" ).on( "click", "#nicknameit", function() {
     if ( $("input[name='nickname']")) {
       nickname = $("input[name='nickname']");
       searches[searchIndex].nickname = $("input[name='nickname']").val();
-      //console.log(JSON.stringify(searches[searchIndex]));
-      //$( "input[name='nickname']" ).val("");
       showSearches();
       showCurrentSearch(searchIndex);
      }
     });
+
+$( "#translation" ).on( "click", "#hedgeslink", function() {
+    for (i=0; i < hedges.length; i++){
+      var myvalue = hedges[i].term;
+      var myname = hedges[i].name;
+      $("#hedges").append('<input type="radio" name="hedge" value="' + myvalue + '"> ' + myname + '<br>')
+    }
+    $('#hedges-list').modal();
+    });
+
+$( "#hedge" ).click(function() {
+    var selHedge = $('input[name=hedge]:checked').val();
+    var prehedge = $("#translationtext").text();
+    var hedgesearch = prehedge + " AND " + selHedge;
+    $('#hedges-list').modal('hide');
+    dosearch(hedgesearch);
+   });
 
 $( "#past" ).on( "click", "#showcompare", function() {
     $("#past input[name='term']").toggle();
@@ -216,13 +264,10 @@ $( "#past" ).on( "click", "#compare", function() {
     //var compareterms = [];
     $( "input[name='term']" ).each(function( index ) {
       if (this.checked) {
-          searchNum = $( this ).val();
-          //compareterms.push(searches[searchNum].term);
-          if (searches[searchNum].yearcounts) {
-            comparisons.push( $( this ).val() );
-          }
+          comparisons.push( $( this ).val() );
         }
       });
+      showComparisons(comparisons);
       compVenn(comparisons);
       drawYearChart(comparisons);
     });
@@ -232,12 +277,15 @@ $( "#past" ).on( "click", ".showsearches", function() {
     });
 
 function showSearches() {
+  var maxheight = $(".row").first().height() * .8;
+  console.log(maxheight);
   var searchname;
-  $( "#past" ).empty();
+  $( "#searches" ).empty();
   $( "#past" ).removeClass( "hideme" );
-  $( "#past" ).append("<div class='panel-heading'>");
-  $( "#past div" ).append("<h3 class='panel-title'>Searches</h3>");
-  $( "#past" ).append("<dl>");
+  $( "#searches" ).attr( 'style', 'max-height:' + maxheight + 'px' );
+  //$( "#past" ).append("<div class='panel-heading'>");
+  //$( "#past div" ).append("<h3 class='panel-title'>Searches</h3>");
+  $( "#searches" ).append("<dl>");
   for (var key in searches) {
     if (searches.hasOwnProperty(key)) {
       if (searches[key].nickname) {
@@ -245,14 +293,14 @@ function showSearches() {
       } else {
         searchname =  searches[key].term;
       }
-      $("#past dl").append('<dt class="pastsearch"><input type="checkbox" name="term" id="' + key + '" value="' + key + '"> <a href="#!">' + searchname + "</a></dt>");
-      $("#past dt").last().append(": " + searches[key].count );
-      $("#past dt").last().data("searchIndex", key);
+      $("#searches dl").append('<dt class="pastsearch"><input type="checkbox" name="term" id="' + key + '" value="' + key + '"> <a href="#!">' + searchname + "</a></dt>");
+      $("#searches dt").last().append(": " + searches[key].count );
+      $("#searches dt").last().data("searchIndex", key);
     }
   }
   $("#past input[name='term']").toggle();
-  if ($("#past dt").last().data("searchIndex") > 0) {
-    $("#past dl").after('<input id="showcompare" type="button" value="Compare searches" />')
+  if ($("#searches dt").last().data("searchIndex") > 0) {
+    $("#searches dl").after('<input id="showcompare" type="button" value="Compare searches" />')
   }
  }
 
@@ -273,6 +321,24 @@ function showCurrentSearch(searchkey) {
   $( "#translation" ).append('<br /><button id="showedit" type="button" class="btn btn-warning">Edit this translation</button>');
   $("#translation").append("<span id='nickname'>Add a nickname for this search: <input type='text' name='nickname'> <button id='nicknameit' type='button' class='btn btn-primary'>Add</button></span>");
   $("[name=nickname]").data("searchIndex", searchkey);
+  shareLinks([currentSearch.term]);
+}
+
+function showComparisons(comparisons) {
+  $( "#translation" ).empty();
+  $( "#translation" ).append('<p id="yourterm">Now comparing:</p><ul />');
+  var shareterms = [];
+  for (i=0; i<comparisons.length; i++) {
+    if (searches[comparisons[i]].nickname) {
+      $( "#translation ul" ).append('<li>"' + searches[comparisons[i]].nickname + '"</li>');
+    } else {
+      $( "#translation ul" ).append("<li>" + searches[comparisons[i]].term + "</li>");
+    }
+  $( "li" ).last().append('<span id="count"> &mdash; <a href="' + pubmedURLstem + encodeURI(searches[comparisons[i]].term) + '">' + searches[comparisons[i]].count + '</a>');
+
+    shareterms.push(searches[comparisons[i]].term);
+  }
+  shareLinks(shareterms);
 }
 
   function fieldstyle(transtext) {
@@ -280,6 +346,31 @@ function showCurrentSearch(searchkey) {
     var rightbracket = leftbracket.replace(/\]/g, ']</span>');
     return rightbracket;
     }
+
+function shareLinks(terms) {
+  $( ".sharelink" ).remove();
+  var vennlinkbase = "https://pubvenn.appspot.com/?";
+  var yearlinkbase = "https://esperr.github.io/pubmed-by-year/?";
+  var vennqstr = "";
+  var yearqstr = "";
+  if (terms.length == 1) {
+    vennqstr = terms[0];
+    yearqstr = "q1=" + terms[0];
+  } else {
+    for (i=0; i<terms.length; i++) {
+      yearqstr += "q" + Number(i+1).toString() + "=" + terms[i];
+      vennqstr += "(" + terms[i] + ")";
+      if (i > -1 && i < terms.length-1) {
+        vennqstr += " AND ";
+        yearqstr += "&";
+      }
+    }
+  }
+  var yearshare = yearlinkbase + yearqstr;
+  var vennshare = vennlinkbase + vennqstr;
+  $( "#yearresults" ).after('<p class="sharelink"><a href="' + yearshare + '" target="_blank">See more on Pubmed by Year</a>')
+  $( "#vennresults" ).after('<p class="sharelink"><a href="' + vennshare + '" target="_blank">See more on PubVenn</a>')
+}
 
  //If something goes wrong, we start over
  function startOver() {
@@ -337,12 +428,17 @@ function dosearch(term) {
       if (data.esearchresult.count < 500) {
         $("#yearresults").empty();
         $("#yearresults").append('Your search only retrieved <strong>' + data.esearchresult.count + '</strong> results. PubMed by Year can only graph searches that have at least 500 results in total.');
+        searches[searchkey].yearcounts = "none";
       } else {
         yearsearch(searchkey, term);
-        startVenn(searchkey, term);
       }
+      startVenn(searchkey, term);
       showCurrentSearch(searchkey);
       searchkey++;
+      if (searchkey == 1) {
+        $( "#vennpanel" ).removeClass( "hideme" )
+        $( "#yearpanel" ).removeClass( "hideme" )
+      }
       //showTranslation(data.esearchresult.querytranslation);
       }
     }
