@@ -126,9 +126,10 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 
 <footer class="footer">
   <div class="container">
-    <span class="text-muted">  <p>Design and contruction by Ed Sperr, M.L.I.S. (<a href="mailto:ed_sperr@hotmail.com">ed_sperr@hotmail.com</a>)   |
-      Data from <a href="http://www.ncbi.nlm.nih.gov/">NCBI</a>  |   Charting tools from  <a href="https://developers.google.com/chart/interactive/docs/gallery/barchart" target="_blank">Google</a>
-     | See the code at <a href="https://github.com/esperr/mesh-cat-graph">GitHub</a></p></span>
+    <span class="text-muted">  <p>Design and contruction by <a href="https://esperr.github.io/about/">Ed Sperr, M.L.I.S.</a>  |
+      Data from <a href="http://www.ncbi.nlm.nih.gov/">NCBI</a>  |   Visualization tools from  <a href="https://developers.google.com/chart/interactive/docs/gallery/barchart" target="_blank">Google</a> and
+      <a href="https://github.com/benfred/venn.js/" target="_blank">Ben Frederickson</a>
+     | See the code at <a href="https://github.com/esperr/search-workbench">GitHub</a></p></span>
   </div>
 </footer>
 
@@ -154,6 +155,12 @@ $( "#vennresults" ).attr( "style", "max-width: " + vennwidth + "px;" );
 google.charts.load('current', {'packages':['line']});
 
 (function() {
+//do hedges programatically
+for (i=0; i < hedges.length; i++){
+  var myvalue = hedges[i].term;
+  var myname = hedges[i].name;
+  $("#hedges").append('<input type="radio" name="hedge" value="' + myvalue + '"> ' + myname + '<br>')
+  }
 
 function handlesearch() {
   var term = $("#pmsearch").val();
@@ -163,25 +170,25 @@ function handlesearch() {
   dosearch(term);
   }
 
+//Page actions and behaviors
+function showWait() {
+  $( "#pmsearch" ).prop( "disabled", true );
+  $( "#pmsearch").val("");
+  $( "#runsearch" ).prop( "disabled", true );
+  $( "form" ).addClass( "hideme" );
+  $( "#yearresults").empty();
+  $( "#yearresults" ).append("<div id='loading'><p class='text-center'>Grabbing your results &mdash; please wait</p></div>")
+  $( "#yearresults p" ).append( '<br /><img src="loading-bars.svg">' );
+  }
 
-  function showWait() {
-    $( "#pmsearch" ).prop( "disabled", true );
-    $( "#pmsearch").val("");
-    $( "#runsearch" ).prop( "disabled", true );
-    $( "form" ).addClass( "hideme" );
-    $( "#yearresults").empty();
-    $( "#yearresults" ).append("<div id='loading'><p class='text-center'>Grabbing your results &mdash; please wait</p></div>")
-    $( "#yearresults p" ).append( '<br /><img src="loading-bars.svg">' );
-    }
-
-    function showDone() {
-      $( "#pmsearch" ).prop( "disabled", false );
-      $( "#runsearch" ).prop( "disabled", false );
-      $( "form" ).removeClass( "hideme" );
-      $( "#runsearch" ).removeClass( "hideme" );
-      //$("#loading").remove();
-      $("#fetchresults").remove();
-      }
+function showDone() {
+  $( "#pmsearch" ).prop( "disabled", false );
+  $( "#runsearch" ).prop( "disabled", false );
+  $( "form" ).removeClass( "hideme" );
+  $( "#runsearch" ).removeClass( "hideme" );
+  //$("#loading").remove();
+  $("#fetchresults").remove();
+  }
 
 $( "#past" ).on( "click", ".pastsearch", function() {
   //while (sets.length) { sets.pop(); }
@@ -211,19 +218,16 @@ $( "#translation" ).on( "click", "#canceledits", function() {
     showCurrentSearch(searchIndex);
   });
 
-  $( "#translation" ).on( "click", "#showedit", function() {
-      $( "#search" ).toggle();
-      $( "#showedit" ).toggle();
-      $( "#yourterm" ).toggle();
-      $( "#count" ).toggle();
-
-      $('#translationtext').attr('contenteditable','true');
-      $('#translationtext').addClass( "editing" );
-      $("#translationtext").after('<br /><button id="searchedits" type="button" class="btn btn-primary">Run this search</button>');
-      $("#searchedits").after(' <button id="hedgeslink" type="button" class="btn btn-primary">Add a Hedge</button>');
-      $("#hedgeslink").after(' <button id="canceledits" type="button" class="btn btn-danger">Cancel</button>');
-
-      //$( "#translation" ).empty();
+$( "#translation" ).on( "click", "#showedit", function() {
+    $( "#search" ).toggle();
+    $( "#showedit" ).toggle();
+    $( "#yourterm" ).toggle();
+    $( "#count" ).toggle();
+    $('#translationtext').attr('contenteditable','true');
+    $('#translationtext').addClass( "editing" );
+    $("#translationtext").after('<br /><button id="searchedits" type="button" class="btn btn-primary">Run this search</button>');
+    $("#searchedits").after(' <button id="hedgeslink" type="button" class="btn btn-primary" data-toggle="modal" data-target="#hedges-list">Add a Hedge</button>');
+    $("#hedgeslink").after(' <button id="canceledits" type="button" class="btn btn-danger">Cancel</button>');
     });
 
 $( "#translation" ).on( "click", "#nicknameit", function() {
@@ -236,14 +240,17 @@ $( "#translation" ).on( "click", "#nicknameit", function() {
      }
     });
 
-$( "#translation" ).on( "click", "#hedgeslink", function() {
-    for (i=0; i < hedges.length; i++){
-      var myvalue = hedges[i].term;
-      var myname = hedges[i].name;
-      $("#hedges").append('<input type="radio" name="hedge" value="' + myvalue + '"> ' + myname + '<br>')
-    }
-    $('#hedges-list').modal();
+$( "#translation" ).on( "click", "#deleteme", function() {
+    var searchIndex = $("[name=nickname]").data("searchIndex");
+    delete searches[searchIndex];
+    alert("Search deleted");
+    showSearches();
+    $( "#translation" ).hide();
     });
+
+//$( "#translation" ).on( "click", "#hedgeslink", function() {
+//    $('#hedges-list').modal();
+//    });
 
 $( "#hedge" ).click(function() {
     var selHedge = $('input[name=hedge]:checked').val();
@@ -276,6 +283,7 @@ $( "#past" ).on( "click", ".showsearches", function() {
     showSearches();
     });
 
+//Searching...
 function showSearches() {
   var maxheight = $(".row").first().height() * .8;
   console.log(maxheight);
@@ -304,23 +312,27 @@ function showSearches() {
   }
  }
 
+//...and displaying results
 function showCurrentSearch(searchkey) {
   currentSearch = searches[searchkey];
+  $( "#translation" ).show();
   $( "#translation" ).empty();
   $( "#translation" ).append('<p id="yourterm">Your search:</p>');
   $( "#yourterm" ).append("'" + currentSearch.term + "'");
   if (currentSearch.nickname) {
     $( "#yourterm" ).append(' (alias "' + currentSearch.nickname + '")');
   }
-  $( "#yourterm" ).append('<span id="count"> found <a href="' + pubmedURLstem + encodeURI(currentSearch.term) + '">' + currentSearch.count + '</a> results</span>');
-
+  var pmurl = pubmedURLstem + encodeURI(currentSearch.term);
+  $( "#yourterm" ).append('<span id="count"> found <a href="' + pmurl + '" target="_pmresults">' + currentSearch.count + '</a> results</span>');
+  $( "#yourterm" ).append('&nbsp; <a href="' + pmurl +'" " target="_blank"><span class="glyphicon glyphicon-new-window"></span></a>');
   $( "#translation" ).append('<p>Was translated to:</p>');
   $( "#translation" ).append("<div id='translationtext'>");
   var newtranslation = fieldstyle(currentSearch.translation);
   $( "#translationtext" ).append(newtranslation);
-  $( "#translation" ).append('<br /><button id="showedit" type="button" class="btn btn-warning">Edit this translation</button>');
+  $( "#translation" ).append('<br /><button id="showedit" type="button" class="btn btn-warning">Edit this search</button>');
   $("#translation").append("<span id='nickname'>Add a nickname for this search: <input type='text' name='nickname'> <button id='nicknameit' type='button' class='btn btn-primary'>Add</button></span>");
   $("[name=nickname]").data("searchIndex", searchkey);
+  $("#showedit").after(' <button id="deleteme" type="button" class="btn btn-danger">Delete this search</button>');
   shareLinks([currentSearch.term]);
 }
 
@@ -328,24 +340,26 @@ function showComparisons(comparisons) {
   $( "#translation" ).empty();
   $( "#translation" ).append('<p id="yourterm">Now comparing:</p><ul />');
   var shareterms = [];
+  var pmurl;
   for (i=0; i<comparisons.length; i++) {
     if (searches[comparisons[i]].nickname) {
       $( "#translation ul" ).append('<li>"' + searches[comparisons[i]].nickname + '"</li>');
     } else {
       $( "#translation ul" ).append("<li>" + searches[comparisons[i]].term + "</li>");
     }
-  $( "li" ).last().append('<span id="count"> &mdash; <a href="' + pubmedURLstem + encodeURI(searches[comparisons[i]].term) + '">' + searches[comparisons[i]].count + '</a>');
-
+    pmurl = pubmedURLstem + encodeURI(searches[comparisons[i]].term);
+    $( "li" ).last().append('<span id="count"> &mdash; <a href="' + pmurl + '" target="_pmresults"">' + searches[comparisons[i]].count + '</a>');
+    $( "li" ).last().append('&nbsp; <a href="' + pmurl +'" " target="_blank"><span class="glyphicon glyphicon-new-window"></span></a>');
     shareterms.push(searches[comparisons[i]].term);
   }
   shareLinks(shareterms);
 }
 
-  function fieldstyle(transtext) {
-    var leftbracket = transtext.replace(/\[/g, '<span class="field">[');
-    var rightbracket = leftbracket.replace(/\]/g, ']</span>');
-    return rightbracket;
-    }
+function fieldstyle(transtext) {
+  var leftbracket = transtext.replace(/\[/g, '<span class="field">[');
+  var rightbracket = leftbracket.replace(/\]/g, ']</span>');
+  return rightbracket;
+  }
 
 function shareLinks(terms) {
   $( ".sharelink" ).remove();
@@ -449,16 +463,13 @@ $("#runsearch").click(function(){
     handlesearch();
   });
 
- $(document).keypress(function(e) {
-  if(e.which == 13) {
-      //Because both IE and FF now "helpfully" ignore the spec and treat 'button' the same as 'submit'
-      e.preventDefault();
-      handlesearch();
+$(document).keypress(function(e) {
+if(e.which == 13) {
+    //Because both IE and FF now "helpfully" ignore the spec and treat 'button' the same as 'submit'
+    e.preventDefault();
+    handlesearch();
   }
 });
-
-
-
 
 $(".close").click(function(){
   $("#printable").css("display", "none");
@@ -470,9 +481,6 @@ $(document).click(function(event) {
       $("#printable").css("display", "none");
       }
       });
-
-
-
 })
 
 ();
