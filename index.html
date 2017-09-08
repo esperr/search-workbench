@@ -23,13 +23,15 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 <script src="venn.js"></script>
 <script src="vennframework.js"></script>
 <script src="yearframework.js"></script>
+<script src="uniques.js"></script>
+
 <script src="hedges.js"></script>
 
 <div class="container">
 
 <div id="topbanner" class="jumbotron">
   <h1>Search Workbench</h1>
-  <a id="about" class="label label-default" href="about.html">About MeSH Category Graph</a>
+  <a id="about" class="label label-default" href="about.html">About Search Workbench</a>
 </div>
 
 <div class="row">
@@ -40,28 +42,29 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 </form>
 -->
 
-<div id="left" class="col-sm-12 col-md-10 col-lg-9">
+<div id="left" class="col-sm-12 col-md-10 col-lg-8">
 
 <div id="search" class="input-group input-group-lg">
   <input type="text" id="pmsearch" class="form-control">
   <span class="input-group-btn">
-    <button id="runsearch" class="btn btn-default" type="button">Search</button>
+    <button id="runsearch" class="btn btn-primary" type="button">Search</button>
   </span>
 
 </div>
 
 <div id="translation">
   <div id="splash">
-    <p>Don't Enter your MEDLINE search above, and MeSH Category Graph will show how the concepts in your results stack up against the <a href="https://www.nlm.nih.gov/bsd/disted/meshtutorial/meshtreestructures/">16 top-level categories</a>
-      in the MeSH hierarchy. For each search you'll see <em>two</em> graphs &mdash; one showing percentages compared to those for
-      all of MEDLINE and another showing relative proportion. Once you have completed at least two searches, you can <em>compare</em> the proportions of one search against another. <em><a href="about.html">(more)</a></em></p>
+    <p>Search Workbench lets you easily examine, edit and visualize your <a href="https://www.ncbi.nlm.nih.gov/pubmed/">PubMed</a> Searches. See
+      how the parts of your search overlap and observe how it performs over time.</p>
+      <p>Then <em>compare</em> your searches to another in order to zero-in on exactly the terms you want to use.
+      <em><a href="about.html">(more)</a></em></p>
     </div>
 </div>
 
 
 </div>
 
-<div class="col-sm-12 col-md-2 col-lg-3">
+<div class="col-sm-12 col-md-2 col-lg-4">
 
 <div id="past" class="panel panel-default hideme">
   <div class="panel-heading">
@@ -87,6 +90,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
         <div class="panel-body">
           <div id="vennresults"></div>
         </div>
+        <div class="panel-footer"></div>
       </div>
 
       <div id="yearpanel" class="panel panel-default hideme">
@@ -96,6 +100,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
         <div class="panel-body">
           <div id="yearresults"></div>
         </div>
+        <div class="panel-footer"></div>
       </div>
 
 
@@ -121,13 +126,31 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
   </div>
 </div>
 
+<div id="unique-records" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Unique Records</h4>
+      </div>
+      <div id="uniques" class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
 
+</div>
+
+<p style='clear: both; margin-bottom: 60px;'></p>
+<br />
 
 <footer class="footer">
   <div class="container">
     <span class="text-muted">  <p>Design and contruction by <a href="https://esperr.github.io/about/">Ed Sperr, M.L.I.S.</a>  |
-      Data from <a href="http://www.ncbi.nlm.nih.gov/">NCBI</a>  |   Visualization tools from  <a href="https://developers.google.com/chart/interactive/docs/gallery/barchart" target="_blank">Google</a> and
+      Data from <a href="http://www.ncbi.nlm.nih.gov/">NCBI</a>  |   Visualization tools from  <a href="https://developers.google.com/chart/interactive/docs/gallery/linechart" target="_blank">Google</a> and
       <a href="https://github.com/benfred/venn.js/" target="_blank">Ben Frederickson</a>
      | See the code at <a href="https://github.com/esperr/search-workbench">GitHub</a></p></span>
   </div>
@@ -223,11 +246,12 @@ $( "#translation" ).on( "click", "#showedit", function() {
     $( "#showedit" ).toggle();
     $( "#yourterm" ).toggle();
     $( "#count" ).toggle();
+    $( "#deleteme" ).toggle();
     $('#translationtext').attr('contenteditable','true');
     $('#translationtext').addClass( "editing" );
     $("#translationtext").after('<br /><button id="searchedits" type="button" class="btn btn-primary">Run this search</button>');
-    $("#searchedits").after(' <button id="hedgeslink" type="button" class="btn btn-primary" data-toggle="modal" data-target="#hedges-list">Add a Hedge</button>');
-    $("#hedgeslink").after(' <button id="canceledits" type="button" class="btn btn-danger">Cancel</button>');
+    $("#searchedits").after(' &nbsp;&nbsp;&nbsp;<button id="hedgeslink" type="button" class="btn btn-info" data-toggle="modal" data-target="#hedges-list">Add a Hedge</button>');
+    $("#hedgeslink").after(' &nbsp;<button id="canceledits" type="button" class="btn btn-default">Cancel</button>');
     });
 
 $( "#translation" ).on( "click", "#nicknameit", function() {
@@ -263,7 +287,7 @@ $( "#hedge" ).click(function() {
 $( "#past" ).on( "click", "#showcompare", function() {
     $("#past input[name='term']").toggle();
     $("#showcompare").toggle();
-    $("#past dl").after('<input id="compare" type="button" value="Compare" /><p style="margin-top: 1em;"><a href="#!" class="showsearches">(go back to search list)</a></p>')
+    $("#past dl").after('<input id="compare" type="button" class="btn btn-primary" value="Compare" /><button id="closecompare" type="button" class="btn btn-default showsearches">Close</button>')
     });
 
 $( "#past" ).on( "click", "#compare", function() {
@@ -308,7 +332,7 @@ function showSearches() {
   }
   $("#past input[name='term']").toggle();
   if ($("#searches dt").last().data("searchIndex") > 0) {
-    $("#searches dl").after('<input id="showcompare" type="button" value="Compare searches" />')
+    $("#searches dl").after('<input id="showcompare" type="button" class="btn btn-default" value="Compare searches" />')
   }
  }
 
@@ -329,10 +353,10 @@ function showCurrentSearch(searchkey) {
   $( "#translation" ).append("<div id='translationtext'>");
   var newtranslation = fieldstyle(currentSearch.translation);
   $( "#translationtext" ).append(newtranslation);
-  $( "#translation" ).append('<br /><button id="showedit" type="button" class="btn btn-warning">Edit this search</button>');
-  $("#translation").append("<span id='nickname'>Add a nickname for this search: <input type='text' name='nickname'> <button id='nicknameit' type='button' class='btn btn-primary'>Add</button></span>");
+  $("#translation").append("<span id='nickname'>Add a nickname for this search:<br /><input type='text' name='nickname'> <button id='nicknameit' type='button' class='btn btn-default'>Add</button></span>");
+  $( "#translation" ).append('<br /><button id="showedit" type="button" class="btn btn-info">Edit this search</button>');
   $("[name=nickname]").data("searchIndex", searchkey);
-  $("#showedit").after(' <button id="deleteme" type="button" class="btn btn-danger">Delete this search</button>');
+  $("#showedit").after(' &nbsp;&nbsp;<button id="deleteme" type="button" class="btn btn-danger">Delete this search</button>');
   shareLinks([currentSearch.term]);
 }
 
@@ -353,6 +377,7 @@ function showComparisons(comparisons) {
     shareterms.push(searches[comparisons[i]].term);
   }
   shareLinks(shareterms);
+  findUniques(shareterms);
 }
 
 function fieldstyle(transtext) {
@@ -362,6 +387,7 @@ function fieldstyle(transtext) {
   }
 
 function shareLinks(terms) {
+  $( ".panel-footer").show();
   $( ".sharelink" ).remove();
   var vennlinkbase = "https://pubvenn.appspot.com/?";
   var yearlinkbase = "https://esperr.github.io/pubmed-by-year/?";
@@ -380,10 +406,10 @@ function shareLinks(terms) {
       }
     }
   }
-  var yearshare = yearlinkbase + yearqstr;
-  var vennshare = vennlinkbase + vennqstr;
-  $( "#yearresults" ).after('<p class="sharelink"><a href="' + yearshare + '" target="_blank">See more on Pubmed by Year</a>')
-  $( "#vennresults" ).after('<p class="sharelink"><a href="' + vennshare + '" target="_blank">See more on PubVenn</a>')
+  var yearshare = yearlinkbase + encodeURI(yearqstr);
+  var vennshare = vennlinkbase + encodeURI(vennqstr);
+  $( "#yearpanel .panel-footer" ).append('<p class="sharelink"><a href="' + yearshare + '" target="_blank">See more on Pubmed by Year</a>')
+  $( "#vennpanel .panel-footer" ).append('<p class="sharelink"><a href="' + vennshare + '" target="_blank">See more on PubVenn</a>')
 }
 
  //If something goes wrong, we start over
@@ -442,6 +468,7 @@ function dosearch(term) {
       if (data.esearchresult.count < 500) {
         $("#yearresults").empty();
         $("#yearresults").append('Your search only retrieved <strong>' + data.esearchresult.count + '</strong> results. PubMed by Year can only graph searches that have at least 500 results in total.');
+        $("#yearpanel .panel-footer").hide();
         searches[searchkey].yearcounts = "none";
       } else {
         yearsearch(searchkey, term);

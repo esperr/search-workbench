@@ -182,6 +182,7 @@ function startVenn(searchkey, term) {
 		if (possibleTerms<2) {
 			$("#vennresults").empty();
 			$("#vennresults").append('<p class="vennMsg">Only one valid term entered.</p>');
+      $("#vennpanel .panel-footer").hide();
       searches[myIndex].vennsets = [];
 		} else {
 			getSimpleSets(termsarray, possibleTerms);
@@ -245,8 +246,8 @@ var chart = venn.VennDiagram()
 var div = d3.select("#vennresults")
 div.datum(sets).call(chart);
 
-var fixtext = d3.selectAll("text")
-         .attr("font-size","1.25em");
+//var fixtext = d3.selectAll("text")
+//         .attr("font-size","1.25em");
 
 //var svg = d3.select("svg").call(zoom);
 
