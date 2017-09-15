@@ -66,6 +66,15 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 
 <div class="col-sm-12 col-md-2 col-lg-4">
 
+  <div id="load-session" class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">Load previous session</h3>
+    </div>
+    <div class="panel-body">
+      <button id="loadText" type="button" class="btn btn-success">Load form textfile</button>
+    </div>
+  </div>
+
 <div id="past" class="panel panel-default hideme">
   <div class="panel-heading">
     <h3 class="panel-title">Searches</h3>
@@ -127,7 +136,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 </div>
 
 <div id="unique-records" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -142,6 +151,41 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
   </div>
 </div>
 
+<div id="save-session" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Save this session</h4>
+      </div>
+      <div class="modal-body">
+        <p>You can save this session to return and work with it later.</p> <p>Choose to save it locally (only on this computer/browser) or to download it
+          as a text file.</p>
+        <a id="savemeText" href="" download="searchworkbench_session.txt"><button type="button" class="btn btn-success">Download session</button></a>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="load-session" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Load a saved session</h4>
+      </div>
+      <div id="loadme" class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 
 <p style='clear: both; margin-bottom: 60px;'></p>
@@ -184,6 +228,15 @@ for (i=0; i < hedges.length; i++){
   var myname = hedges[i].name;
   $("#hedges").append('<input type="radio" name="hedge" value="' + myvalue + '"> ' + myname + '<br>')
   }
+
+//localSession stuff...
+if (storageAvailable('localStorage')) {
+  $( "#savemeText" ).before('<button id="savemeLocal" type="button" class="btn btn-success">Save locally</button> ');
+}
+
+if(localStorage.getItem('session')) {
+  $( "#loadText" ).before('<button id="loadLocal" type="button" class="btn btn-success">Load local</button> ');
+}
 
 function handlesearch() {
   var term = $("#pmsearch").val();
@@ -270,6 +323,7 @@ $( "#translation" ).on( "click", "#deleteme", function() {
     alert("Search deleted");
     showSearches();
     $( "#translation" ).hide();
+    $( "#search" ).show();
     });
 
 //$( "#translation" ).on( "click", "#hedgeslink", function() {
@@ -287,6 +341,7 @@ $( "#hedge" ).click(function() {
 $( "#past" ).on( "click", "#showcompare", function() {
     $("#past input[name='term']").toggle();
     $("#showcompare").toggle();
+    $("#savebutton").toggle();
     $("#past dl").after('<input id="compare" type="button" class="btn btn-primary" value="Compare" /><button id="closecompare" type="button" class="btn btn-default showsearches">Close</button>')
     });
 
@@ -309,6 +364,7 @@ $( "#past" ).on( "click", ".showsearches", function() {
 
 //Searching...
 function showSearches() {
+  $('#load-session').hide();
   var maxheight = $(".row").first().height() * .8;
   console.log(maxheight);
   var searchname;
@@ -332,7 +388,8 @@ function showSearches() {
   }
   $("#past input[name='term']").toggle();
   if ($("#searches dt").last().data("searchIndex") > 0) {
-    $("#searches dl").after('<input id="showcompare" type="button" class="btn btn-default" value="Compare searches" />')
+    $("#searches dl").after('<input id="showcompare" type="button" class="btn btn-default" value="Compare searches" />');
+    $("#showcompare").after('<button id="savebutton" class="btn btn-default" data-toggle="modal" data-target="#save-session">Save session</button>');
   }
  }
 
@@ -377,7 +434,7 @@ function showComparisons(comparisons) {
     shareterms.push(searches[comparisons[i]].term);
   }
   shareLinks(shareterms);
-  findUniques(shareterms);
+  findUniques(comparisons);
 }
 
 function fieldstyle(transtext) {
@@ -498,16 +555,57 @@ if(e.which == 13) {
   }
 });
 
-$(".close").click(function(){
-  $("#printable").css("display", "none");
+
+$( "#savemeLocal" ).click(function() {
+  localStorage.setItem('session', JSON.stringify(searches));
+  $('#save-session').modal('hide');
+});
+
+$( "#loadLocal" ).click(function() {
+  searches = JSON.parse(localStorage.getItem('session'));
+  console.log(JSON.stringify(searches));
+  var newIndex = 0;
+  for (index in searches) {
+    newIndex = index;
+  }
+  console.log(index);
+  showSearches();
+  searchkey = newIndex + 1;
+  $( "#vennpanel" ).removeClass( "hideme" );
+  $( "#yearpanel" ).removeClass( "hideme" );
+});
+
+$( "#save-session" ).on('shown.bs.modal', function (e){
+      //alert("I want this to appear after the modal has opened!");
+      var dataurl ='data:text/plain;charset=utf-8,'
+            + encodeURIComponent(JSON.stringify(searches));
+      $("#savemeText").attr("href", dataurl);
       });
 
-$(document).click(function(event) {
-   var closeit = document.getElementById('printable');
-   if (event.target == closeit) {
-      $("#printable").css("display", "none");
-      }
-      });
+function storageAvailable(type) {
+    try {
+        var storage = window[type],
+            x = '__storage_test__';
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+    }
+    catch(e) {
+        return e instanceof DOMException && (
+            // everything except Firefox
+            e.code === 22 ||
+            // Firefox
+            e.code === 1014 ||
+            // test name field too, because code might not be present
+            // everything except Firefox
+            e.name === 'QuotaExceededError' ||
+            // Firefox
+            e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+            // acknowledge QuotaExceededError only if there's something already stored
+            storage.length !== 0;
+    }
+}
+
 })
 
 ();
