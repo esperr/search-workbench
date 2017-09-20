@@ -27,7 +27,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 
 <script src="hedges.js"></script>
 
-<div class="container">
+<div class="container-fluid">
 
 <div id="topbanner" class="jumbotron">
   <h1>Search Workbench</h1>
@@ -42,7 +42,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 </form>
 -->
 
-<div id="left" class="col-sm-12 col-md-10 col-lg-8">
+<div id="left" class="col-sm-12 col-md-6 col-lg-8">
 
 <div id="search" class="input-group input-group-lg">
   <input type="text" id="pmsearch" class="form-control">
@@ -64,14 +64,14 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 
 </div>
 
-<div class="col-sm-12 col-md-2 col-lg-4">
+<div class="col-sm-12 col-md-6 col-lg-4">
 
   <div id="load-session" class="panel panel-default">
     <div class="panel-heading">
       <h3 class="panel-title">Load previous session</h3>
     </div>
     <div class="panel-body">
-      <button id="loadText" type="button" class="btn btn-success">Load form textfile</button>
+      <button id="loadText" class="btn btn-default" data-toggle="modal" data-target="#load-text" type="button" class="btn btn-default">Load from textfile</button>
     </div>
   </div>
 
@@ -89,9 +89,9 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 </div>
 
 <div class="row">
-  <div class="col-sm-12 col-md-12 col-lg-12">
     <div id="charts">
 
+    <div class="col-md-6">
       <div id="vennpanel" class="panel panel-default hideme">
         <div class="panel-heading">
           <h3 class="panel-title">Venn diagram</h3>
@@ -101,7 +101,9 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
         </div>
         <div class="panel-footer"></div>
       </div>
+    </div>
 
+    <div class="col-md-6">
       <div id="yearpanel" class="panel panel-default hideme">
         <div class="panel-heading">
           <h3 class="panel-title">Proportion by year</h3>
@@ -111,10 +113,10 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
         </div>
         <div class="panel-footer"></div>
       </div>
+    </div>
 
 
     </div>
-  </div>
 </div>
 
 <div id="hedges-list" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
@@ -171,21 +173,65 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
   </div>
 </div>
 
-<div id="load-session" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
-  <div class="modal-dialog modal-lg" role="document">
+<div id="save-local" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Load a saved session</h4>
+        <h4 class="modal-title">Save this session</h4>
       </div>
-      <div id="loadme" class="modal-body">
+      <div class="modal-body">
+        <input type='text' name='sessionname' value="enter a name"><br />
+        <em>This session will only be saved on this browser and machine &ndash; choose "download session" to export it to another machine.</em>
       </div>
       <div class="modal-footer">
+        <button id="savelocally" type="button" class="btn btn-success">Save</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
 </div>
+
+<div id="load-local" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Load a saved session</h4>
+      </div>
+      <div class="modal-body">
+        <p>Choose a saved session from the following list:</p>
+        <div id="loadme"></div>
+        <br />
+        <button id="loadLocal" type="button" class="btn btn-success">Load this session</button>
+        <button id="deleteLocal" type="button" class="btn btn-danger">Delete</button>
+      </div>
+      <div class="modal-footer">
+
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="load-text" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Load session from text file</h4>
+      </div>
+      <div class="modal-body">
+        <input type="file" id="input"  accept="text/plain">
+      </div>
+      <div class="modal-footer">
+        <button id="loadtextfile" type="button" class="btn btn-success">Load this session</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>
 
 <p style='clear: both; margin-bottom: 60px;'></p>
@@ -216,10 +262,12 @@ if (yearwidth > myyearwidth) {
   myyearwidth = yearwidth;
   myyearheight = yearwidth*.50;
 }
-$( "#yearresults" ).attr( "style", "max-width: " + yearwidth + "px;" );
-$( "#vennresults" ).attr( "style", "max-width: " + vennwidth + "px;" );
+$( "#yearresults" ).attr( "style", "min-width: " + yearwidth + "px;" );
+$( "#vennresults" ).attr( "style", "min-width: " + vennwidth + "px;" );
 
-google.charts.load('current', {'packages':['line']});
+//google.charts.load('current', {'packages':['line']});
+//trying standard
+google.charts.load("current", {packages: ["corechart"]});
 
 (function() {
 //do hedges programatically
@@ -234,9 +282,7 @@ if (storageAvailable('localStorage')) {
   $( "#savemeText" ).before('<button id="savemeLocal" type="button" class="btn btn-success">Save locally</button> ');
 }
 
-if(localStorage.getItem('session')) {
-  $( "#loadText" ).before('<button id="loadLocal" type="button" class="btn btn-success">Load local</button> ');
-}
+getLocalsessions();
 
 function handlesearch() {
   var term = $("#pmsearch").val();
@@ -557,13 +603,22 @@ if(e.which == 13) {
 
 
 $( "#savemeLocal" ).click(function() {
-  localStorage.setItem('session', JSON.stringify(searches));
+  //localStorage.setItem('session', JSON.stringify(searches));
   $('#save-session').modal('hide');
+  $('#save-local').modal('show');
 });
 
+$( "#savelocally" ).click(function() {
+  var savekey = $("input[name='sessionname']").val();
+  localStorage.setItem(savekey, JSON.stringify(searches));
+  $('#save-local').modal('hide');
+});
+
+
 $( "#loadLocal" ).click(function() {
-  searches = JSON.parse(localStorage.getItem('session'));
-  console.log(JSON.stringify(searches));
+  var selsession = $('input[name=savedsession]:checked').val();
+  searches = JSON.parse(localStorage.getItem(selsession));
+  $('#load-local').modal('hide');
   var newIndex = 0;
   for (index in searches) {
     newIndex = index;
@@ -574,6 +629,42 @@ $( "#loadLocal" ).click(function() {
   $( "#vennpanel" ).removeClass( "hideme" );
   $( "#yearpanel" ).removeClass( "hideme" );
 });
+
+$( "#deleteLocal" ).click(function() {
+  var selsession = $('input[name=savedsession]:checked').val();
+  localStorage.removeItem(selsession);
+  $('#load-local').modal('hide');
+  $('#llocalbutton').remove();
+  getLocalsessions();
+});
+
+$( "#loadtextfile" ).click(function() {
+  var selectedFile = document.getElementById('input').files[0];
+  console.log(selectedFile);
+  var r = new FileReader();
+  r.onload = function(event) {
+  // Why yes, this is a nested mess!
+    try {
+      (function () {
+        searches = JSON.parse(event.target.result);
+        var newIndex = 0;
+        for (index in searches) {
+          newIndex = index;
+        }
+        console.log(index);
+        showSearches();
+        searchkey = newIndex + 1;
+      })();
+    } catch (e) {
+      alert("Unable to load search! Please try again...")
+    }
+  };
+  r.readAsText(selectedFile);
+  $( "#vennpanel" ).removeClass( "hideme" );
+  $( "#yearpanel" ).removeClass( "hideme" );
+  $('#load-text').modal('hide');
+});
+
 
 $( "#save-session" ).on('shown.bs.modal', function (e){
       //alert("I want this to appear after the modal has opened!");
@@ -604,6 +695,27 @@ function storageAvailable(type) {
             // acknowledge QuotaExceededError only if there's something already stored
             storage.length !== 0;
     }
+}
+
+function getLocalsessions() {
+  $("#loadme").empty();
+  localSessions = [];
+  $.each(localStorage, function(key, value){
+     if (typeof localStorage[key] == "string") {
+       localSessions.push(key);
+      }
+    });
+
+  if (localSessions.length > 0) {
+    console.log(localSessions);
+    $( "#loadText" ).before('<button id="llocalbutton" class="btn btn-default" data-toggle="modal" data-target="#load-local">Load local</button>  ');
+    for (i=0; i < localSessions.length; i++){
+      var myvalue = localSessions[i];
+      var myname = localSessions[i];
+      $("#loadme").append('<input type="radio" name="savedsession" value="' + myvalue + '"> ' + myname + '<br>');
+      }
+    $("input[name=savedsession]").prop("checked", true);
+  }
 }
 
 })
