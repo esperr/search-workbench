@@ -45,6 +45,26 @@ margin-bottom: 60px;
 #past p {
   margin-left: 1em;
 }
+.uniquelist {
+  margin-bottom: 1.5em;
+}
+
+.uniquelist dl {
+  font-size: .9em;
+  margin-left: .6em;
+}
+
+.uniquelist dt {
+  margin-top: .6em;
+}
+
+.uniquelist dd {
+  color: grey;
+}
+
+.seemoreuniq, .uniquedesc {
+  font-weight: bold;
+}
 #searches {
   overflow: auto;
 }
@@ -132,18 +152,6 @@ margin-bottom: 60px;
   float: right;
 }
 
-#vennpanel {
-  width: 48%;
-  float: left;
-  margin-bottom: 110px;
-}
-
-#yearpanel {
-  width: 48%;
-  float: left;
-  margin-left:2em;
-
-}
 .venntooltip {
   position: absolute;
   text-align: center;
