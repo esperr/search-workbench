@@ -90,11 +90,11 @@ function parseUniques(uniques) {
     $( "#uniques" ).append('<div class="uniquelist">');
     var uniquetitle = uniques[i].term;
     if (uniques[i].nickname) { uniquetitle = uniques[i].nickname; }
-    $( ".uniquelist" ).last().append('<p>Records found <em>only</em> for "' + uniquetitle + '" in this set of comparisons:</p> <dl/>');
+    $( ".uniquelist" ).last().append('<p class="uniquedesc">Records found <em>only</em> for "' + uniquetitle + '" in this set of comparisons:</p> <dl/>');
     var mydocs = uniques[i].docs;
     $.each(mydocs, function (i, record) {
         if (record.hasOwnProperty('uid')) {
-          $( ".uniquelist dl" ).last().append('<dt><a href="https://www.ncbi.nlm.nih.gov/pubmed/' + record.uid + '">' + record.title + '</a></dt>');
+          $( ".uniquelist dl" ).last().append('<dt><a href="https://www.ncbi.nlm.nih.gov/pubmed/' + record.uid + '"  target="_pmresults">' + record.title + '</a></dt>');
           var names = [];
           var a = 0;
           while (a < record.authors.length) {
@@ -113,7 +113,7 @@ function parseUniques(uniques) {
         // code...
       });
       var pmurl = pubmedURLstem + encodeURI(uniques[i].search);
-      $( ".uniquelist" ).last().append('<a href="' + pmurl + '" target="_pmresults">See more on PubMed</a>');
+      $( ".uniquelist" ).last().append('<a href="' + pmurl + '" target="_pmresults" class="seemoreuniq">See more on PubMed</a>');
   }
   $( "#translation" ).append('<button class="btn btn-primary" data-toggle="modal" data-target="#unique-records">Show unique records</button>')
 }
