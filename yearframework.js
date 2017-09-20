@@ -63,7 +63,8 @@ function yearsearch(searchkey, term) {
 
     data = new google.visualization.DataTable();
 
-    data.addColumn('string', 'Year');
+    //data.addColumn('string', 'Year');
+    data.addColumn('date', 'Year');
     for (i = 0; i < yearsearches.searchterms.length; i++) {
       data.addColumn('number', yearsearches.searchterms[i]);
     }
@@ -71,7 +72,8 @@ function yearsearch(searchkey, term) {
     for (var year in yearsearches.counts) {
       if (Number(year) < startYear) { continue; }
       if (Number(year) > endYear) { continue; }
-      theseCounts = [year];
+      //theseCounts = [year];
+      theseCounts = [new Date(Number(year), 11)];
       for (i = 0; i < yearsearches.searchterms.length; i++) {
         var term = yearsearches.searchterms[i];
         var yearTotal = Number(yearsearches.counts[year]["total"]);
@@ -92,20 +94,36 @@ function yearsearch(searchkey, term) {
     }
 
     options = {
+          /**
+          old options for material charts
           chart: {
             title: 'Proportion of citations in PubMed',
             subtitle: 'proportion for each search by year'
           },
-          width: myyearwidth,
-          height: myyearheight,
+          //width: myyearwidth,
+          //height: myyearheight,
+          axisTitlesPosition: 'in',
           vAxis: {format: 'decimal',
                   title: 'proportion'},
+          **/
+          legend: { position: 'bottom',
+                    textStyle: {fontSize: 15 } },
+          //chartArea:{left:10,top:10,width:'85%',height:'50%'}
         };
     $("#yearresults").empty();
     //$( "#yrearesults" ).append( '<div class="panel panel-default">' );
     //$( "#yearresults .panel" ).append( '<div id="chart_div" class="panel-body">' );
-    var chart = new google.charts.Line(document.getElementById('yearresults'));
 
-    chart.draw(data,  google.charts.Line.convertOptions(options));
+    //var chart = new google.charts.Line(document.getElementById('yearresults'));
+    //chart.draw(data,  google.charts.Line.convertOptions(options));
+
+    var date_formatter = new google.visualization.DateFormat({
+      pattern: "yyyy"
+    });
+    date_formatter.format(data, 0);
+    //trying standard
+    var chart = new google.visualization.LineChart(document.getElementById('yearresults'));
+    chart.draw(data, options);
+
 
     }
