@@ -136,6 +136,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
         <form id="hedges" />
       </div>
       <div class="modal-footer">
+        <span style="float: left;">Sources: <a href="https://www.ncbi.nlm.nih.gov/books/NBK3827/#pubmedhelp.Clinical_Queries_Filters" target="_blank">NLM</a>, <a href="https://hiru.mcmaster.ca/hiru/HIRU_Hedges_MEDLINE_Strategies.aspx"  target="_blank">HiRU</a></span>
         <button type="button" id="hedge" class="btn btn-primary">Add Hedge</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
@@ -647,6 +648,7 @@ $( "#deleteLocal" ).click(function() {
 $( "#loadtextfile" ).click(function() {
   var selectedFile = document.getElementById('input').files[0];
   console.log(selectedFile);
+  checkdate(selectedFile);
   var r = new FileReader();
   r.onload = function(event) {
   // Why yes, this is a nested mess!
@@ -724,6 +726,18 @@ function getLocalsessions() {
   }
 }
 
+function checkdate(selectedFile) {
+  var now = new Date();
+  if ( selectedFile.lastModified ) {
+    var filedate = new Date(selectedFile.lastModified);
+  } else {
+    var filedate = new Date(selectedFile.lastModifiedDate);
+  }
+  var daysDiff = (Math.floor(now - filedate) / 86400000);
+  if (daysDiff > 30) {
+    alert("This saved session is more than 30 days old. Result counts may have changed.");
+  }
+}
 })
 
 ();
