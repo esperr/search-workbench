@@ -2,13 +2,21 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
   <title>Search Workbench</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
   <link href="custom.css" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
+  <!-- Global Site Tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-433406-10"></script>
   <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments)};
+    gtag('js', new Date());
 
+    gtag('config', 'UA-433406-10');
   </script>
+
 
 </head>
 
@@ -27,7 +35,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 
 <script src="hedges.js"></script>
 
-<div class="container-fluid">
+<div class="container">
 
 <div id="topbanner" class="jumbotron">
   <h1>Search Workbench</h1>
@@ -130,6 +138,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
         <form id="hedges" />
       </div>
       <div class="modal-footer">
+        <span style="float: left;">Sources: <a href="https://www.ncbi.nlm.nih.gov/books/NBK3827/#pubmedhelp.Clinical_Queries_Filters" target="_blank">NLM</a>, <a href="https://hiru.mcmaster.ca/hiru/HIRU_Hedges_MEDLINE_Strategies.aspx"  target="_blank">HiRU</a></span>
         <button type="button" id="hedge" class="btn btn-primary">Add Hedge</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
@@ -640,7 +649,8 @@ $( "#deleteLocal" ).click(function() {
 
 $( "#loadtextfile" ).click(function() {
   var selectedFile = document.getElementById('input').files[0];
-  console.log(selectedFile);
+  checkdate(selectedFile);
+
   var r = new FileReader();
   r.onload = function(event) {
   // Why yes, this is a nested mess!
@@ -651,7 +661,6 @@ $( "#loadtextfile" ).click(function() {
         for (index in searches) {
           newIndex = index;
         }
-        console.log(index);
         showSearches();
         searchkey = newIndex + 1;
       })();
@@ -715,6 +724,19 @@ function getLocalsessions() {
       $("#loadme").append('<input type="radio" name="savedsession" value="' + myvalue + '"> ' + myname + '<br>');
       }
     $("input[name=savedsession]").prop("checked", true);
+  }
+}
+
+function checkdate(selectedFile) {
+  var now = new Date();
+  if ( selectedFile.lastModified ) {
+    var filedate = new Date(selectedFile.lastModified);
+  } else {
+    var filedate = new Date(selectedFile.lastModifiedDate);
+  }
+  var daysDiff = (Math.floor(now - filedate) / 86400000);
+  if (daysDiff > 1) {
+    alert("This saved session is more than 30 days old. Result counts may have changed.");
   }
 }
 
