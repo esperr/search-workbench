@@ -13,6 +13,9 @@ img {
   width: 50%;
   float: right;
 }
+
+li { display: inline-block; }
+
 </style>
 
 <!-- Global Site Tag (gtag.js) - Google Analytics -->
@@ -45,11 +48,23 @@ img {
       facilitating the process of fine-tuning a search strategy.</p>
 
     <h2>How it works</h2>
+    <ul>
+    <li><a href="#editing">Editing your search</a></li> |
+    <li><a href="#nicknames">Nicknaming a search</a></li> |
+    <li><a href="#managing">Comparing searches</a></li> |
+    <li><a href="#saving">Saving and retrieving</a></li> |
+    <li><a href="#uniques">Unique records</a></li>
+  </ul>
+
     <p>When you enter a search, it is run against PubMed using the <a href="https://www.ncbi.nlm.nih.gov/books/NBK25501/">programmatic interface</a> maintainted by the <a href="https://www.ncbi.nlm.nih.gov/">National Center for Biotechnology Information</a>. You first see how your search
       is tranlated by <a href="https://www.nlm.nih.gov/bsd/disted/pubmedtutorial/020_040.html">Automated Term Mapping</a>. Then you see how the parts of your search relate to one another (using the logic that drives <a href="https://pubvenn.appspot.com/">PubVenn</a>) and how that search performs over time
       (via <a href="https://esperr.github.io/pubmed-by-year/">PubMed-by-year</a>).</p>
 
-    <h3>Search nicknames</h3>
+    <h3 id="editing">Editing a search</h3>
+    <p>Once your search is complete, you can choose to edit it by hand. You can add or subtract terms, boolean operators and parentheses as well as apply one of several pre-defined search hedges.
+    <em>Note:</em> there is is no validation of this edited search before you run it, so beware of typos, unmatched parentheses and field tags that don't fit.</p>
+
+    <h3 id="nicknames">Search nicknames</h3>
     <p>If you directly edit a PubMed <a href="https://www.nlm.nih.gov/bsd/disted/pubmedtutorial/020_040.html">translation</a>, you'll notice that even simple searches, such as "diabetes and heart disease", quickly turn into something a bit more ungainly:</p>
       <blockquote style="font-size: 90%;">
         ("diabetes mellitus"[MeSH Terms] OR ("diabetes"[All Fields] AND "mellitus"[All Fields]) OR "diabetes mellitus"[All Fields] OR "diabetes"[All Fields] OR "diabetes insipidus"[MeSH Terms] OR ("diabetes"[All Fields] AND "insipidus"[All Fields]) OR "diabetes insipidus"[All Fields]) AND ("heart diseases"[MeSH Terms] OR ("heart"[All Fields] AND "diseases"[All Fields]) OR "heart diseases"[All Fields] OR ("heart"[All Fields] AND "disease"[All Fields]) OR "heart disease"[All Fields])
@@ -59,17 +74,24 @@ img {
       <p>In these cases, please take advantage of the ability to <em>nickname</em> a search. Choose a name, click "add", and you'll use that nickname for that search going forward
       </p>
 
-    <h3>Managing and comparing searches</h3>
-    <img src="comp1.PNG" alt="screenshot snippet" />
-    <p>Once you have two or more searches, you can easily compare them using the tools found underneath "Searches".</p>
-    <p>Select the searches you want to compare from a list of ones already performed &mdash; you will then see that comparison diagrammed using the same chart-by-year and venn diagrams seen at the outset.</p>
-    <p>Review (or nickname, or delete) any past search by choosing it from the list.</p>
 
-    <h3>Saving or retrieving a session</h3>
+
+    <h3 id="managing">Managing and comparing searches</h3>
+    <img src="comp1.PNG" alt="screenshot snippet" />
+
+    <p>Once you have two or more searches, you can easily compare them using the tools found underneath "Searches".</p>
+
+    <p>Choose the searches you want to compare from a list of ones already performed and select "Compare searches" &mdash; you will then see that comparison diagrammed using the same chart-by-year and venn diagrams seen at the outset.
+    <em>Note:</em> you can choose as many searches to compare as are needed, though the diagrams can get more cluttered.</p>
+    <img src="comp2.PNG" alt="screenshot snippet" />
+
+    <p>Importantly, you can easily review (or nickname, or delete) any past search by choosing it from the list. Choosing </p>
+    <br style="clear: both;"/>
+    <h3 id="saving">Saving or retrieving a session</h3>
     <p>If you want to save a session for later, you have the option of saving it locally or to a text file. Local sessions are more convenient to work with, but they are <em>only</em> accessible on the browser/machine where you created them. Text files can be used on any machine (and by any user) that can read them.</p>
     <p>You will note the "Load previous session" buttons when you start a session. Just choose the locally saved session (or text file) you want, and you can resume where you left off.</p>
 
-    <h3>Seeing unique records</h3>
+    <h3 id="uniques">Seeing unique records</h3>
     <p>When you are comparing two or more searches, you can choose "Show unique records" to show those citations that show up in one search, but not in any of the others you are comparing at that moment.</p>
 
 	</div>
