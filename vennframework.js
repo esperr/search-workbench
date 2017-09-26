@@ -182,10 +182,10 @@ function startVenn(searchkey, term) {
 		if (possibleTerms<2) {
 			$("#vennresults").empty();
 			$("#vennresults").append('<p class="vennMsg">Only one valid term entered.</p>');
-      $("#vennpanel .panel-footer").hide();
       searches[myIndex].vennsets = [];
 		} else {
 			getSimpleSets(termsarray, possibleTerms);
+      shareLinks([term], "venn");
 		}
 }
 
