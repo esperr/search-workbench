@@ -129,6 +129,10 @@ margin-bottom: 60px;
   color: Silver;
 }
 
+ .question-prompt {
+    float: right;
+ }
+
  #about {
   	float: right;
   	color: black;
@@ -161,6 +165,12 @@ margin-bottom: 60px;
   border: 0px;
   border-radius: 8px;
   opacity: 0;
+}
+
+.vennMsg {
+color:gray;
+font-size:1.5em;
+text-align: center
 }
 
 text.label {
