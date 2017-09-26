@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="custom.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<title>Questions and answers</title>
+<style>
+li { display: inline-block; }
+</style>
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-433406-10"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-433406-10');
+</script>
+
+</head>
+
+<body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+<div class="container">
+<div id="topbanner" class="jumbotron">
+	<h1>Questions and Answers</h1>
+	<a id="about" class="label label-default" href="index.html">Home</a>
+</div>
+   <div class="row">
+
+<div class="col-sm-12 col-md-10 col-lg-9">
+	<div class="panel panel-default">
+	<div class="panel-body">
+    <ul>
+    <li><a href="#translations">What are "translations"?</a></li> |
+    <li><a href="#permalink">Exporting a PubMed search?</a></li> |
+    <li><a href="#vennplanation">About Venn diagrams</a></li> |
+    <li><a href="#yearplanation">About year diagrams</a></li> |
+    <li><a href="#hedges">What is a hedge?</a></li>
+  </ul>
+
+  <h3 id="translations">What are these "translations" and where do they come from?</h3>
+  <p>Every time you enter a PubMed search, the friendly computers at the NCBI work to <a href="http://www.nlm.nih.gov/bsd/disted/pubmedtutorial/020_040.html">translate</a> your terms(s) into a carefully codified search, often combining the words
+    that you typed with a series of <a href="http://www.nlm.nih.gov/pubs/factsheets/mesh.html">Medical Subject Headings (MeSH)</a>. For example, "death" becomes:</p>
+  <blockquote>"death"[MeSH Terms] OR "death"[All Fields]"</blockquote> <p>...while "heart attacks and aspirin" turns into the slightly more wordy</p>
+  <blockquote>("myocardial infarction"[MeSH Terms] OR ("myocardial"[All Fields] AND "infarction"[All Fields]) OR "myocardial infarction"[All Fields] OR ("heart"[All Fields] AND "attacks"[All Fields]) OR "heart attacks"[All Fields]) AND ("aspirin"[MeSH Terms] OR "aspirin"[All Fields])"</blockquote>
+  <p>Search Workbench presents exactly the same translation to you as if you had scrolled down to the "Search details" box in PubMed. You may find that this interpolation of your original terms is not exactly what you are looking for &mdash;
+    experienced searchers can modify it by hand using the "Edit this search" option.</p>
+
+  <h3 id="permalink">Can I export a modified search to use in PubMed?</h3>
+  <p>If you choose the <span class="glyphicon glyphicon-link"></span> icon next to your search, you'll open it in a new PubMed window.
+    Just copy the address from this window and use that URL to run the search again.</p>
+
+  <h3 id="vennplanation">What are these Venn diagrams about?</h3>
+  <p>If you want to contruct a PubMed search of any complexity, you have to think about how you want to combine your terms using <a href="https://www.nlm.nih.gov/bsd/disted/pubmedtutorial/020_350.html">boolean logic</a>. Search Workbench helps to facilitate
+    this process by showing you how the results for your search terms in PubMed compare to one another in total size as well as how they overlap.</p>
+  <p>These diagrams are not only displayed for individual searches (so long as you have more than one term), but they are also displayed for comparisons as well. Comparing searches directly is useful for seeing exactly how variants of a search do or do not overlap.
+    <em>Note:</em> The display logic underlying the Venn diagram will almost always give a good sense of set proportions, plotting intersections onto a two-dimensional plane can be somewhat inexact for any diagram involving more than two sets.</p>
+  <p>For more fun with Venn diagrams, check out <a href="https://pubvenn.appspot.com">PubVenn</a>.
+
+  <h3 id="yearplanation">What do Proportion by Year diagrams represent?</h3>
+  <p>As you might have guessed, the "Proportion by year" chart shows you how the results for a particular search compare with PubMed as a whole over time. Remember, these are <em>not</em> raw totals, but proportions. It is entirely possible for the proportions
+    for a search to remain steady (or decrease) even as the number of citations entered <a href="https://www.nlm.nih.gov/bsd/medline_cit_counts_yr_pub.html">increases dramatically each year</a>.
+    <em>Note:</em> with some searches, you may see a dip as your graph gets to the current year. This is likely an artifact of citations being included in PubMed before they are formally indexed; any search that relies upon MeSH headings will underperform until the indexing catches up.
+    <p>You can see these diagrams in a larger version by visting <a href="https://esperr.github.io/pubmed-by-year/index.html">PubMed by Year</a>.</p>
+
+    <h3 id="hedges">What is a hedge?</h3>
+    <p>A hedge is a pre-built part of a search that helps you focus your retrieval on a particualr topic.</p>
+
+	</div>
+	</div>
+</div>
+
+
+
+</div>
+</div>
+</body>
