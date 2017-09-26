@@ -78,7 +78,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
       <h3 class="panel-title">Load previous session</h3>
     </div>
     <div class="panel-body">
-      <button id="loadText" class="btn btn-default" data-toggle="modal" data-target="#load-text" type="button">Load from textfile</button>
+      <button id="loadText" class="btn btn-default" title="Load a session from a saved file on this machine" data-toggle="modal" data-target="#load-text" type="button">Load from textfile</button>
     </div>
   </div>
 
@@ -101,6 +101,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
     <div class="col-md-6">
       <div id="vennpanel" class="panel panel-default hideme">
         <div class="panel-heading">
+          <a href="questionsandanswers.html#vennplanation" target="_qanda"><span class="question-prompt glyphicon glyphicon-question-sign"></span></a>
           <h3 class="panel-title">Venn diagram</h3>
         </div>
         <div class="panel-body">
@@ -113,6 +114,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
     <div class="col-md-6">
       <div id="yearpanel" class="panel panel-default hideme">
         <div class="panel-heading">
+          <a href="questionsandanswers.html#yearplanation" target="_qanda"><span class="question-prompt glyphicon glyphicon-question-sign"></span></a>
           <h3 class="panel-title">Proportion by year</h3>
         </div>
         <div class="panel-body">
@@ -171,7 +173,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
       <div class="modal-body">
         <p>You can save this session to return and work with it later.</p> <p>Choose to save it locally (only on this computer/browser) or to download it
           as a text file.</p>
-        <a id="savemeText" href="" download="searchworkbench_session.txt"><button type="button" class="btn btn-success">Download session</button></a>
+        <a id="savemeText" href="" download="searchworkbench_session.txt" class="btn btn-success">Download session</a>
 
       </div>
       <div class="modal-footer">
@@ -277,7 +279,38 @@ $( "#vennresults" ).attr( "style", "min-width: " + vennwidth + "px;" );
 //trying standard
 google.charts.load("current", {packages: ["corechart"]});
 
+function shareLinks(terms, type) {
+  console.log(type);
+  var vennlinkbase = "https://pubvenn.appspot.com/?";
+  var yearlinkbase = "https://esperr.github.io/pubmed-by-year/?";
+  var vennqstr = "";
+  var yearqstr = "";
+  if (terms.length == 1) {
+    vennqstr = terms[0];
+    yearqstr = "q1=" + terms[0];
+  } else {
+    for (i=0; i<terms.length; i++) {
+      yearqstr += "q" + Number(i+1).toString() + "=" + terms[i];
+      vennqstr += "(" + terms[i] + ")";
+      if (i > -1 && i < terms.length-1) {
+        vennqstr += " AND ";
+        yearqstr += "&";
+      }
+    }
+  }
+  var yearshare = yearlinkbase + encodeURI(yearqstr);
+  var vennshare = vennlinkbase + encodeURI(vennqstr);
+  if (type == "venn") {
+    $( "#vennpanel .panel-footer" ).append('<p id="vennshare" class="sharelink"><a href="' + vennshare + '" target="_blank">See more on PubVenn</a>')
+  } else if (type == "year") {
+    $( "#yearpanel .panel-footer" ).append('<p id="yearshare" class="sharelink"><a href="' + yearshare + '" target="_blank">See more on Pubmed by Year</a>')
+  }
+}
+
 (function() {
+
+//$('[data-toggle="tooltip"]').tooltip();
+
 //do hedges programatically
 for (i=0; i < hedges.length; i++){
   var myvalue = hedges[i].term;
@@ -416,6 +449,10 @@ $( "#past" ).on( "click", ".showsearches", function() {
     showSearches();
     });
 
+$( ".row" ).on( "click", "#reset", function() {
+    location.replace(location.pathname);
+    });
+
 //Searching...
 function showSearches() {
   $('#load-session').hide();
@@ -452,6 +489,8 @@ function showCurrentSearch(searchkey) {
   currentSearch = searches[searchkey];
   $( "#translation" ).show();
   $( "#translation" ).empty();
+  $( "#translation" ).append('<a href="questionsandanswers.html#translations" target="_qanda"><span class="question-prompt glyphicon glyphicon-question-sign"></span></a>');
+  $('[data-toggle="popover"]').popover();
   $( "#translation" ).append('<p id="yourterm">Your search:</p>');
   $( "#yourterm" ).append("'" + currentSearch.term + "'");
   if (currentSearch.nickname) {
@@ -459,7 +498,7 @@ function showCurrentSearch(searchkey) {
   }
   var pmurl = pubmedURLstem + encodeURI(currentSearch.term);
   $( "#yourterm" ).append('<span id="count"> found <a href="' + pmurl + '" target="_pmresults">' + currentSearch.count + '</a> results</span>');
-  $( "#yourterm" ).append('&nbsp; <a href="' + pmurl +'" " target="_blank"><span class="glyphicon glyphicon-new-window"></span></a>');
+  $( "#yourterm" ).append('&nbsp; <a href="' + pmurl +'" " target="_blank"><span class="glyphicon glyphicon-link"></span></a>');
   $( "#translation" ).append('<p>Was translated to:</p>');
   $( "#translation" ).append("<div id='translationtext'>");
   var newtranslation = fieldstyle(currentSearch.translation);
@@ -468,7 +507,7 @@ function showCurrentSearch(searchkey) {
   $( "#translation" ).append('<br /><button id="showedit" type="button" class="btn btn-info">Edit this search</button>');
   $("[name=nickname]").data("searchIndex", searchkey);
   $("#showedit").after(' &nbsp;&nbsp;<button id="deleteme" type="button" class="btn btn-danger">Delete this search</button>');
-  shareLinks([currentSearch.term]);
+  //shareLinks([currentSearch.term], "year");
 }
 
 function showComparisons(comparisons) {
@@ -484,10 +523,12 @@ function showComparisons(comparisons) {
     }
     pmurl = pubmedURLstem + encodeURI(searches[comparisons[i]].term);
     $( "li" ).last().append('<span id="count"> &mdash; <a href="' + pmurl + '" target="_pmresults"">' + searches[comparisons[i]].count + '</a>');
-    $( "li" ).last().append('&nbsp; <a href="' + pmurl +'" " target="_blank"><span class="glyphicon glyphicon-new-window"></span></a>');
+    $( "li" ).last().append('&nbsp; <a href="' + pmurl +'" " target="_blank"><span class="glyphicon glyphicon-link"></span></a>');
     shareterms.push(searches[comparisons[i]].term);
   }
-  shareLinks(shareterms);
+  $( ".sharelink" ).remove();
+  shareLinks(shareterms, "year");
+  shareLinks(shareterms, "venn");
   findUniques(comparisons);
 }
 
@@ -497,9 +538,8 @@ function fieldstyle(transtext) {
   return rightbracket;
   }
 
-function shareLinks(terms) {
-  $( ".panel-footer").show();
-  $( ".sharelink" ).remove();
+function shareLinks(terms, type) {
+  console.log(type);
   var vennlinkbase = "https://pubvenn.appspot.com/?";
   var yearlinkbase = "https://esperr.github.io/pubmed-by-year/?";
   var vennqstr = "";
@@ -519,8 +559,11 @@ function shareLinks(terms) {
   }
   var yearshare = yearlinkbase + encodeURI(yearqstr);
   var vennshare = vennlinkbase + encodeURI(vennqstr);
-  $( "#yearpanel .panel-footer" ).append('<p class="sharelink"><a href="' + yearshare + '" target="_blank">See more on Pubmed by Year</a>')
-  $( "#vennpanel .panel-footer" ).append('<p class="sharelink"><a href="' + vennshare + '" target="_blank">See more on PubVenn</a>')
+  if (type == "venn") {
+    $( "#vennpanel .panel-footer" ).append('<p id="vennshare" class="sharelink"><a href="' + vennshare + '" target="_blank">See more on PubVenn</a>')
+  } else if (type == "year") {
+    $( "#yearpanel .panel-footer" ).append('<p id="yearshare" class="sharelink"><a href="' + yearshare + '" target="_blank">See more on Pubmed by Year</a>')
+  }
 }
 
  //If something goes wrong, we start over
@@ -576,13 +619,14 @@ function dosearch(term) {
 
       showDone();
       showSearches();
+      $( ".sharelink" ).remove();
       if (data.esearchresult.count < 500) {
         $("#yearresults").empty();
-        $("#yearresults").append('Your search only retrieved <strong>' + data.esearchresult.count + '</strong> results. PubMed by Year can only graph searches that have at least 500 results in total.');
-        $("#yearpanel .panel-footer").hide();
+        $("#yearresults").append('<p class="vennMsg">Your search only retrieved <strong>' + data.esearchresult.count + '</strong> results. PubMed by Year can only graph searches that have at least 500 results in total.</p>');
         searches[searchkey].yearcounts = "none";
       } else {
         yearsearch(searchkey, term);
+        shareLinks([term], "year");
       }
       startVenn(searchkey, term);
       showCurrentSearch(searchkey);
@@ -590,6 +634,8 @@ function dosearch(term) {
       if (searchkey == 1) {
         $( "#vennpanel" ).removeClass( "hideme" )
         $( "#yearpanel" ).removeClass( "hideme" )
+        $("#charts").after('<button id="reset" type="button" style="float: right;" class="btn btn-danger">Reset All Searches</button>');
+        $('[data-toggle="popover"]').popover();
       }
       //showTranslation(data.esearchresult.querytranslation);
       }
@@ -717,7 +763,8 @@ function getLocalsessions() {
 
   if (localSessions.length > 0) {
     console.log(localSessions);
-    $( "#loadText" ).before('<button id="llocalbutton" class="btn btn-default" data-toggle="modal" data-target="#load-local">Load local</button>  ');
+    $( "#loadText" ).before('<button id="llocalbutton" class="btn btn-default" title="Tooltip on top" data-toggle="modal" data-target="#load-local">Load local</button>  ');
+    //$('[data-toggle="tooltip"]').tooltip();
     for (i=0; i < localSessions.length; i++){
       var myvalue = localSessions[i];
       var myname = localSessions[i];
