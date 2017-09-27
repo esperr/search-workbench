@@ -72,7 +72,7 @@ function buildOLCounts(search) {
 	   myOverlap = new setOverlapSet(search.sets,data.esearchresult.count);
 	   sets.push(myOverlap);
      if (!vennsearches.length) {
-       if (!searches[myIndex].vennsets) {
+       if (myIndex && !searches[myIndex].vennsets) {
          writeSets();
        }
        drawVennDiagram();
