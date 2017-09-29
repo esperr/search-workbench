@@ -372,6 +372,8 @@ $( "#past" ).on( "click", ".pastsearch", function() {
 $( "#translation" ).on( "click", "#searchedits", function() {
     $( "#search" ).toggle();
     var newterm = $("#translationtext").text();
+    newterm = newterm.replace(/(\r\n|\n|\r)/gm,"");
+    console.log(newterm);
     dosearch(newterm);
   });
 
