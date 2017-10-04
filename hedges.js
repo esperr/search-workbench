@@ -24,7 +24,7 @@ var hedges = [
   { "name": "Qualitative",
     "term": "interview*[Title/Abstract] OR interviews[MeSH:noexp] OR experience*[Text Word] OR qualitative[Title/Abstract]" },
   { "name": "Costs",
-    "term": "'costs and cost analysis'[MeSH Term] OR costs[Title/Abstract] OR cost effective*[Title/Abstract]" },
-  { "name": "Economics ",
+    "term": '"costs and cost analysis"[MeSH Term] OR costs[Title/Abstract] OR cost effective*[Title/Abstract]' },
+  { "name": "Economics",
     "term": "cost*[Title/Abstract] OR 'costs and cost analysis'[MeSH:noexp] OR cost benefit analys*[Title/Abstract] OR cost-benefit analysis[MeSH Term] OR health care costs[MeSH:noexp]" },
 ]
