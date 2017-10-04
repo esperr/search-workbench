@@ -422,9 +422,10 @@ $( "#translation" ).on( "click", "#deleteme", function() {
 $( "#hedge" ).click(function() {
     var selHedge = $('input[name=hedge]:checked').val();
     var prehedge = $("#translationtext").text();
-    var hedgesearch = prehedge + " AND " + selHedge;
+    var hedgesearch = prehedge + " AND (" + selHedge + ")";
     $('#hedges-list').modal('hide');
     dosearch(hedgesearch);
+    $( "#search" ).show();
    });
 
 $( "#past" ).on( "click", "#showcompare", function() {
