@@ -51,6 +51,7 @@ function esearch(term) {
 	retmode: 'json',
 	retmax: 0,
 	email: 'ed_sperr@hotmail.com',
+  api_key: 'f069cf776feaa627ab9b1e0fc2b090610708',
 	tool: 'searchworkbench'
 	}
      });
@@ -66,6 +67,7 @@ function buildOLCounts(search) {
 	retmode: 'json',
 	retmax: 0,
 	email: 'ed_sperr@hotmail.com',
+  api_key: 'f069cf776feaa627ab9b1e0fc2b090610708',
 	tool: 'searchworkbench'
   },
   success: function( data ) {
