@@ -4,7 +4,8 @@ var allcounts;
 var d = new Date();
 var thisYear = d.getFullYear();
 var startYear = 1945;
-var endYear = thisYear;
+//data for most recent year (or at least though February) is *super* hinky
+var endYear = thisYear-1;
 
 var data;
 var options;
