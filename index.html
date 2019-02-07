@@ -259,6 +259,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 
 <script>
 var searches = {};
+var pausetime;
 var searchkey = 0;
 var pubmedURLstem = "https://www.ncbi.nlm.nih.gov/pubmed/?term=";
 
@@ -280,7 +281,6 @@ $( "#vennresults" ).attr( "style", "min-width: " + vennwidth + "px;" );
 google.charts.load("current", {packages: ["corechart"]});
 
 function shareLinks(terms, type) {
-  console.log(type);
   var vennlinkbase = "https://pubvenn.appspot.com/?";
   var yearlinkbase = "https://esperr.github.io/pubmed-by-year/?";
   var vennqstr = "";
@@ -359,6 +359,7 @@ $( "#past" ).on( "click", ".pastsearch", function() {
   showCurrentSearch(searchIndex);
   //console.log(JSON.stringify(searches[searchIndex].vennsets));
   drawYearChart([searchIndex]);
+  console.log(searches[searchIndex]);
   if (searches[searchIndex].vennsets.length < 1) {
     $("#vennresults").empty();
     $("#vennresults").append('<p class="vennMsg">Only one valid term entered.</p>');
@@ -373,7 +374,6 @@ $( "#translation" ).on( "click", "#searchedits", function() {
     $( "#search" ).toggle();
     var newterm = $("#translationtext").text();
     newterm = newterm.replace(/(\r\n|\n|\r)/gm,"");
-    console.log(newterm);
     dosearch(newterm);
   });
 
@@ -460,7 +460,6 @@ $( ".row" ).on( "click", "#reset", function() {
 function showSearches() {
   $('#load-session').hide();
   var maxheight = $(".row").first().height() * .8;
-  console.log(maxheight);
   var searchname;
   $( "#searches" ).empty();
   $( "#past" ).removeClass( "hideme" );
@@ -542,7 +541,6 @@ function fieldstyle(transtext) {
   }
 
 function shareLinks(terms, type) {
-  console.log(type);
   var vennlinkbase = "https://pubvenn.appspot.com/?";
   var yearlinkbase = "https://esperr.github.io/pubmed-by-year/?";
   var vennqstr = "";
@@ -581,6 +579,7 @@ function shareLinks(terms, type) {
 
 function dosearch(term) {
   showWait();
+  pausetime = performance.now();
   $.ajax({
     url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi',
     error: function () {
@@ -680,7 +679,6 @@ $( "#loadLocal" ).click(function() {
   for (index in searches) {
     newIndex = index;
   }
-  console.log(index);
   showSearches();
   searchkey = newIndex + 1;
   $( "#vennpanel" ).removeClass( "hideme" );
@@ -697,7 +695,6 @@ $( "#deleteLocal" ).click(function() {
 
 $( "#loadtextfile" ).click(function() {
   var selectedFile = document.getElementById('input').files[0];
-  console.log(selectedFile);
   checkdate(selectedFile);
   var r = new FileReader();
   r.onload = function(event) {
@@ -709,7 +706,6 @@ $( "#loadtextfile" ).click(function() {
         for (index in searches) {
           newIndex = index;
         }
-        console.log(index);
         showSearches();
         searchkey = newIndex + 1;
       })();
@@ -765,7 +761,6 @@ function getLocalsessions() {
     });
 
   if (localSessions.length > 0) {
-    console.log(localSessions);
     $( "#loadText" ).before('<button id="llocalbutton" class="btn btn-default" title="Tooltip on top" data-toggle="modal" data-target="#load-local">Load local</button>  ');
     //$('[data-toggle="tooltip"]').tooltip();
     for (i=0; i < localSessions.length; i++){
