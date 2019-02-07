@@ -41,46 +41,55 @@ function setSearch(sets, terms) {
     this.terms = terms;
 }
 
-function esearch(term) {
-     return $.ajax({
-	url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi',
-	data: {
-	db: 'pubmed',
-	usehistory: 'y',
-	term: term,
-	retmode: 'json',
-	retmax: 0,
-	email: 'ed_sperr@hotmail.com',
-  api_key: 'f069cf776feaa627ab9b1e0fc2b090610708',
-	tool: 'searchworkbench'
-	}
-     });
+function psearch(searchstr, callback) {
+  checktime();
+
+  function checktime() {
+    var t1 = performance.now();
+    var timediff = t1 - pausetime;
+    if (timediff > 425) {
+      callutils();
+    } else {
+      setTimeout(checktime, 30);
+    }
+  }
+
+  function callutils() {
+    calltime = performance.now();
+    console.log(calltime - pausetime);
+    pausetime = calltime;
+    $.ajax({
+  	url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi',
+    error: function () {
+      startOver();
+      //alert("Oops, something went wrong. Please try again!")
+      return;
+    },
+  	data: {
+  	db: 'pubmed',
+  	usehistory: 'y',
+  	term: searchstr,
+  	retmode: 'json',
+  	retmax: 0,
+  	email: 'ed_sperr@hotmail.com',
+  	tool: 'pmsearchbench'
+    },
+    success: callback
+       });
+  }
+
 }
 
 function buildOLCounts(search) {
-  $.ajax({
-	url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi',
-	data: {
-	db: 'pubmed',
-	usehistory: 'y',
-	term: search.terms,
-	retmode: 'json',
-	retmax: 0,
-	email: 'ed_sperr@hotmail.com',
-  api_key: 'f069cf776feaa627ab9b1e0fc2b090610708',
-	tool: 'searchworkbench'
-  },
-  success: function( data ) {
-	   myOverlap = new setOverlapSet(search.sets,data.esearchresult.count);
-	   sets.push(myOverlap);
-     if (!vennsearches.length) {
-       if (myIndex && !searches[myIndex].vennsets) {
-         writeSets();
-       }
-       drawVennDiagram();
-     }
-  }
-     });
+  psearch(search.terms, function( data ) {
+    myOverlap = new setOverlapSet(search.sets,data.esearchresult.count);
+    sets.push(myOverlap);
+    if (!searches.length) {
+      drawVennDiagram ();
+      writeSets();
+      //drawPrintable ();
+    }
+  });
 }
 
 function writeSets() {
@@ -91,7 +100,8 @@ function writeSets() {
 
 function getOLCounts() {
 	//We do it this way instaed of a loop so we can easily throttle the count requests with setTimeout
-	mysearch = vennsearches.pop();
+
+  mysearch = vennsearches.pop();
 	buildOLCounts(mysearch);
   var progressProportion = 1/vennsearches.length;
   $("progress").attr("value", progressProportion*100);
@@ -121,17 +131,18 @@ getOLCounts();
 }
 
 function getSimpleSets(termsarray, possibles) {
+
  $.each(termsarray, function (i, term) {
-     esearch(termsarray[i])
-     .then(function( data ) {
+   //for (term of termsarray) {
+     psearch(term, function( data ) {
 	var numResults = Number(data.esearchresult.count);
 	if (numResults != 0) {
-		mySet = new setSet(termsarray[i], numResults);
+		mySet = new setSet(term, numResults);
 		sets.push(mySet);
 	}
     if (sets.length >= possibles) { getOverlaps(); }
      });
-
+//}
     });
 }
 
