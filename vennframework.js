@@ -131,7 +131,7 @@ getOLCounts();
 }
 
 function getSimpleSets(termsarray, possibles) {
-
+  pausetime = performance.now();
  $.each(termsarray, function (i, term) {
    //for (term of termsarray) {
      psearch(term, function( data ) {

@@ -30,7 +30,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 <script src="venn.js"></script>
 <script src="vennframework.js"></script>
 <script src="yearframework.js"></script>
-<script src="uniques.js"></script>
+<!--<script src="uniques.js"></script>-->
 
 <script src="hedges.js"></script>
 
@@ -359,7 +359,7 @@ $( "#past" ).on( "click", ".pastsearch", function() {
   showCurrentSearch(searchIndex);
   //console.log(JSON.stringify(searches[searchIndex].vennsets));
   drawYearChart([searchIndex]);
-  console.log(searches[searchIndex]);
+  //console.log(searches[searchIndex]);
   if (searches[searchIndex].vennsets.length < 1) {
     $("#vennresults").empty();
     $("#vennresults").append('<p class="vennMsg">Only one valid term entered.</p>');
@@ -531,7 +531,7 @@ function showComparisons(comparisons) {
   $( ".sharelink" ).remove();
   shareLinks(shareterms, "year");
   shareLinks(shareterms, "venn");
-  findUniques(comparisons);
+  //findUniques(comparisons);
 }
 
 function fieldstyle(transtext) {
