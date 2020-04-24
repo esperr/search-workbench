@@ -5,7 +5,9 @@ var d = new Date();
 var thisYear = d.getFullYear();
 var startYear = 1945;
 //data for most recent year (or at least though February) is *super* hinky
-var endYear = thisYear-1;
+//What was the year 30 days ago?
+d.setDate(d.getDate()-30);
+var endYear = d.getFullYear();
 
 var data;
 var options;
@@ -20,7 +22,7 @@ $.get( "https://med-by-year.appspot.com/showbasecounts", function( data ) {
 });
 
 function yearsearch(searchkey, term) {
-  urlstem = "https://med-by-year.appspot.com/search?q=";
+  urlstem = "https://med-by-year.appspot.com/newsearch?q=";
   url = urlstem + encodeURIComponent(term);
   $.get( url, function( data ) {
     if (data.hasOwnProperty('counts')) {
