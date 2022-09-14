@@ -81,7 +81,7 @@ function yearsearch(searchkey, term) {
         var term = yearsearches.searchterms[i];
         var yearTotal = Number(yearsearches.counts[year]["total"]);
         if (yearsearches.counts[year][term]) {
-          var proportion = Number(yearsearches.counts[year][term]) / yearTotal;
+          var proportion = (Number(yearsearches.counts[year][term]) / yearTotal) * 100000;
           construct = {
             v: proportion,
             f: yearsearches.counts[year][term] + " citations"
@@ -109,6 +109,10 @@ function yearsearch(searchkey, term) {
           vAxis: {format: 'decimal',
                   title: 'proportion'},
           **/
+
+          vAxis: {
+          title: 'results per 100,000'
+          },
           legend: { position: 'bottom',
                     textStyle: {fontSize: 15 } },
           //chartArea:{left:10,top:10,width:'85%',height:'50%'}

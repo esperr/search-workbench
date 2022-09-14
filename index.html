@@ -581,7 +581,7 @@ function dosearch(term) {
   showWait();
   pausetime = performance.now();
   $.ajax({
-    url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi',
+    url: 'https://eutilspreview.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi',
     error: function () {
       startOver();
       return;
